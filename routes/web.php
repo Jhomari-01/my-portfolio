@@ -11,6 +11,10 @@ use App\Http\Controllers\ResumeRequestController;
 use App\Http\Controllers\UploadController;
 
 // Define specific API/Upload routes BEFORE the catch-all route
+Route::get('/linkstorage', function () {
+    \Illuminate\Support\Facades\Artisan::call('storage:link');
+    return 'Storage linked successfully! You can now close this tab and refresh your site.';
+});
 Route::post('/upload', [UploadController::class, 'upload']);
 Route::apiResource('works', WorkController::class);
 Route::apiResource('certificates', CertificateController::class);
