@@ -11,10 +11,16 @@ use App\Http\Controllers\ResumeRequestController;
 use App\Http\Controllers\UploadController;
 
 // Define specific API/Upload routes BEFORE the catch-all route
-Route::get('/linkstorage', function () {
-    \Illuminate\Support\Facades\Artisan::call('storage:link');
-    return 'Storage linked successfully! You can now close this tab and refresh your site.';
-});
+// Fallback route to serve files directly on shared hosting without needing symlinks
+Route::get('/storage/files/{filename}', function ($filename) {
+    $path = storage_path('app/public/files/' . $filename);
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    $file = file_get_contents($path);
+    $type = mime_content_type($path);
+    return response($file, 200)->header('Content-Type', $type);
+})->where('filename', '.*');
 Route::post('/upload', [UploadController::class, 'upload']);
 Route::apiResource('works', WorkController::class);
 Route::apiResource('certificates', CertificateController::class);
