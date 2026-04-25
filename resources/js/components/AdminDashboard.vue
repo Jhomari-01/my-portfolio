@@ -60,7 +60,7 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 overflow-y-auto p-6 lg:p-10 relative scroll-smooth bg-[#030303]">
+    <main class="flex-1 overflow-y-auto p-6 lg:p-10 relative bg-[#030303]">
       <div class="max-w-6xl mx-auto space-y-10 pb-20">
         
         <!-- Header Actions -->
@@ -227,72 +227,112 @@
               + Add New {{ activeTab.slice(0, -1) }}
             </button>
 
-            <!-- Featured Badge (Works & Certs only) -->
-            <div v-if="activeTab === 'Works' || activeTab === 'Certs'" class="flex items-center justify-between px-4 py-2.5 rounded-2xl bg-amber-500/5 border border-amber-500/20">
-              <div class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-amber-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                <span class="text-[10px] font-black uppercase tracking-widest text-amber-400">Showcase Featured</span>
+            <!-- Featured Management UI -->
+            <div v-if="['Works', 'Certs', 'Stacks'].includes(activeTab)" 
+                 class="p-4 rounded-2xl bg-gradient-to-br from-amber-500/10 to-amber-500/[0.02] border border-amber-500/20 shadow-lg shadow-amber-500/5">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400 border border-amber-500/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  </div>
+                  <span class="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400">Showcase Featured</span>
+                </div>
+                <span v-if="activeTab !== 'Stacks'" :class="['text-[10px] font-black px-3 py-1 rounded-full border', (activeTab === 'Works' ? featuredWorks : featuredCerts).length >= 3 ? 'bg-amber-500 text-black border-amber-400' : 'bg-amber-500/10 text-amber-400 border-amber-500/20']">
+                  {{ (activeTab === 'Works' ? featuredWorks : featuredCerts).length }}/3 Selected
+                </span>
+                <span v-else class="text-[10px] font-black px-3 py-1 rounded-full border bg-amber-500/10 text-amber-400 border-amber-500/20">
+                  {{ featuredStacks.length }} Selected (Unlimited)
+                </span>
               </div>
-              <span :class="['text-[10px] font-black px-2 py-0.5 rounded-full', (activeTab === 'Works' ? featuredWorks : featuredCerts).length >= 3 ? 'bg-amber-500 text-black' : 'bg-amber-500/20 text-amber-400']">{{ (activeTab === 'Works' ? featuredWorks : featuredCerts).length }}/3</span>
+              <p class="text-[9px] text-amber-400/60 font-medium leading-relaxed italic">
+                Pinned items appear at the top of your portfolio's Showcase section. {{ activeTab === 'Stacks' ? 'No limit for tech stacks.' : 'Maximum of 3 allowed.' }}
+              </p>
             </div>
 
             <div v-if="filteredItems.length === 0" class="text-center py-12 border border-dashed border-white/10 rounded-3xl opacity-40">
               <p class="text-sm">No items found. <span v-if="searchQuery">Try a different search term.</span><span v-else>Add your first {{ activeTab.toLowerCase() }}!</span></p>
             </div>
             
-            <div 
-              v-for="item in filteredItems" 
-              :key="item.id"
-              @click="editItem(item)"
-              :class="['p-5 rounded-2xl border transition-all cursor-pointer group flex items-center justify-between', selectedId === item.id ? 'bg-gradient-to-r from-cyan-500/10 to-indigo-600/10 border-cyan-500/40 shadow-lg shadow-cyan-500/5 text-white' : 'bg-white/5 border-white/5 text-gray-300 hover:bg-white/10 hover:border-white/10']"
-            >
-              <div class="flex items-center gap-4 overflow-hidden pr-2">
-                <div :class="['w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors relative', selectedId === item.id ? 'bg-cyan-500/20 text-cyan-400' : 'bg-black/50 text-gray-500 group-hover:text-gray-300 group-hover:bg-white/5']">
-                  <svg v-if="activeTab === 'Works'" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                  <svg v-else-if="activeTab === 'Certs'" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
-                  <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
-                  <!-- Featured Star Indicator -->
-                  <span v-if="(activeTab === 'Works' && featuredWorks.includes(item.id)) || (activeTab === 'Certs' && featuredCerts.includes(item.id))" class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-amber-400 rounded-full flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-2 h-2 text-black" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                  </span>
+              <div 
+                v-for="item in filteredItems" 
+                :key="item.id"
+                @click="editItem(item)"
+                :class="[
+                  'p-5 rounded-[24px] border transition-all duration-500 cursor-pointer group flex items-center justify-between relative overflow-hidden', 
+                  selectedId === item.id 
+                    ? 'bg-[#0a0a0a] border-cyan-500/50 shadow-xl shadow-cyan-500/10 text-white z-10 scale-[1.01]' 
+                    : isFeatured(item.id)
+                      ? 'bg-[#0a0a0a] border-amber-500/50 text-amber-500 shadow-lg shadow-amber-500/5'
+                      : 'bg-white/[0.03] border-white/5 text-gray-400 hover:bg-white/5 hover:border-white/10'
+                ]"
+              >
+                <!-- Selection Indicator -->
+                <div v-if="selectedId === item.id" :class="['absolute top-0 left-0 w-1 h-full', isFeatured(item.id) ? 'bg-amber-500' : 'bg-cyan-500']"></div>
+                
+                <div class="flex items-center gap-4 overflow-hidden pr-2">
+                  <div :class="['w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all relative border', selectedId === item.id ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' : isFeatured(item.id) ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-black/40 text-gray-500 border-white/5 group-hover:text-gray-300 group-hover:bg-white/5']">
+                    <svg v-if="activeTab === 'Works'" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    <svg v-else-if="activeTab === 'Certs'" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
+                  </div>
+                  <div class="truncate">
+                    <h3 :class="['font-bold text-sm truncate flex items-center gap-2', isFeatured(item.id) ? 'text-amber-500' : 'text-white']">
+                      {{ item.title || item.name }}
+                      <span v-if="isFeatured(item.id)" class="px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-400 text-[8px] font-black uppercase tracking-widest border border-amber-500/20">Featured</span>
+                    </h3>
+                    <p :class="['text-[10px] uppercase tracking-widest font-black truncate mt-1', isFeatured(item.id) ? 'text-amber-500/60' : 'text-gray-500']">{{ activeTab === 'Works' ? item.stacks || 'No stacks' : activeTab === 'Certs' ? item.issuer : item.category }}</p>
+                  </div>
                 </div>
-                <div class="truncate">
-                  <h3 class="font-bold text-sm truncate">{{ item.title || item.name }}</h3>
-                  <p class="text-[10px] text-gray-500 uppercase tracking-widest font-black truncate mt-1">{{ activeTab === 'Works' ? item.stacks || 'No stacks' : activeTab === 'Certs' ? item.issuer : item.category }}</p>
+                
+                <div class="flex items-center gap-1 flex-shrink-0">
+                  <!-- Star / Feature Toggle -->
+                  <button 
+                    v-if="['Works', 'Certs', 'Stacks'].includes(activeTab)"
+                    @click.stop="toggleFeatured(item.id)"
+                    :title="isFeatured(item.id) ? 'Remove from showcase' : 'Feature in showcase'"
+                    :class="[
+                      'p-2 rounded-lg transition-all',
+                      isFeatured(item.id)
+                        ? 'text-amber-400 bg-amber-500/10 opacity-100'
+                        : 'opacity-0 group-hover:opacity-100 text-gray-500 hover:text-amber-400 hover:bg-amber-500/10'
+                    ]"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" :fill="isFeatured(item.id) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  </button>
+                  <button @click.stop="deleteItem(item.id)" class="p-2 opacity-0 group-hover:opacity-100 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all" title="Delete Item">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                  </button>
                 </div>
               </div>
-              <div class="flex items-center gap-1 flex-shrink-0">
-                <!-- Star / Feature Toggle (Works & Certs only) -->
-                <button 
-                  v-if="activeTab === 'Works' || activeTab === 'Certs'"
-                  @click.stop="toggleFeatured(item)"
-                  :title="isFeatured(item.id) ? 'Remove from showcase' : 'Feature in showcase'"
-                  :class="[
-                    'p-2 rounded-lg transition-all',
-                    isFeatured(item.id)
-                      ? 'text-amber-400 bg-amber-500/10 opacity-100'
-                      : 'opacity-0 group-hover:opacity-100 text-gray-500 hover:text-amber-400 hover:bg-amber-500/10'
-                  ]"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" :fill="isFeatured(item.id) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                </button>
-                <button @click.stop="deleteItem(item.id)" class="p-2 opacity-0 group-hover:opacity-100 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all" title="Delete Item">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
-                </button>
-              </div>
-            </div>
           </div>
 
           <!-- Editor View -->
           <div class="lg:col-span-2 order-1 bg-white/5 border border-white/5 rounded-[32px] p-8 lg:p-12 relative overflow-hidden h-fit">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 to-indigo-600 opacity-50"></div>
             
-            <div class="flex items-center gap-3 mb-8">
-              <div class="w-8 h-8 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center">
-                <svg v-if="selectedId" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
-                <svg v-else class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            <div class="flex items-center justify-between mb-8">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center">
+                  <svg v-if="selectedId" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                  <svg v-else class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                </div>
+                <h2 class="text-2xl font-black">{{ selectedId ? 'Edit Item' : 'Create New' }}</h2>
               </div>
-              <h2 class="text-2xl font-black">{{ selectedId ? 'Edit Item' : 'Create New' }}</h2>
+
+              <!-- Featured Toggle in Form -->
+              <div v-if="selectedId && (activeTab === 'Works' || activeTab === 'Certs')" class="flex items-center gap-3">
+                <span class="text-[10px] font-black uppercase tracking-widest text-gray-500">Showcase Feature</span>
+                <button 
+                  type="button"
+                  @click="toggleFeatured(selectedId)"
+                  :class="[
+                    'w-12 h-6 rounded-full transition-all duration-500 relative border shadow-inner',
+                    isFeatured(selectedId) ? 'bg-gradient-to-r from-amber-400 to-amber-600 border-amber-300 shadow-lg shadow-amber-500/40' : 'bg-white/10 border-white/10 shadow-black/50'
+                  ]"
+                >
+                  <div :class="['absolute top-1 w-4 h-4 rounded-full transition-all duration-500 shadow-lg', isFeatured(selectedId) ? 'right-1 bg-white' : 'left-1 bg-gray-500']"></div>
+                </button>
+              </div>
             </div>
             
             <form @submit.prevent="handleSubmit" class="space-y-6">
@@ -529,21 +569,6 @@
                   </div>
                 </div>
 
-                <!-- Common: Image URL (Main Display/Hero) -->
-                <div class="space-y-2 md:col-span-2">
-                  <label class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">{{ activeTab === 'Stacks' ? 'Alternative Logo URL' : 'Hero Image URL (Primary Display)' }}</label>
-                  <div class="flex flex-col sm:flex-row gap-4">
-                    <input 
-                      v-model="form.image" 
-                      type="text" 
-                      class="flex-1 bg-[#0a0a0a] border border-white/10 rounded-xl px-5 py-4 text-sm focus:border-cyan-500/50 outline-none transition-all focus:shadow-[0_0_15px_rgba(34,211,238,0.1)]"
-                      placeholder="e.g. /images/logo.png"
-                    >
-                    <div v-if="form.image" class="w-16 h-12 bg-[#0a0a0a] rounded-xl border border-white/10 p-1 flex-shrink-0">
-                      <img :src="form.image" alt="Preview" class="w-full h-full object-cover rounded-lg opacity-80" @error="(e) => e.target.style.display='none'">
-                    </div>
-                  </div>
-                </div>
               </div>
 
               <div class="flex flex-col-reverse sm:flex-row justify-end gap-4 mt-10 pt-8 border-t border-white/5">
@@ -814,9 +839,20 @@
                 <textarea v-model="skillsText" rows="6" class="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-4 text-sm focus:border-cyan-500/50 outline-none transition-all resize-none leading-relaxed" placeholder="Skill 1&#10;Skill 2..."></textarea>
               </div>
 
-
-
             </div>
+          </div>
+          
+          <!-- Save Button Section -->
+          <div class="mt-12 max-w-4xl mx-auto">
+             <button 
+               @click="saveResume" 
+               class="w-full py-6 rounded-[28px] bg-gradient-to-r from-cyan-500 via-indigo-500 to-purple-600 text-white font-black uppercase tracking-[0.25em] text-sm hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-cyan-500/20 flex items-center justify-center gap-4 group border border-white/10"
+             >
+               <div class="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center group-hover:rotate-12 transition-all">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+               </div>
+               Save Resume Changes
+             </button>
           </div>
         </div>
 
@@ -1100,6 +1136,22 @@
         </div>
 
       </div>
+
+      <!-- Toast Notification -->
+      <transition name="toast">
+        <div v-if="toast.visible" class="fixed bottom-8 right-8 z-50 flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl border backdrop-blur-md"
+             :class="toast.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'">
+          <div class="w-8 h-8 rounded-full flex items-center justify-center"
+               :class="toast.type === 'success' ? 'bg-emerald-500/20' : 'bg-red-500/20'">
+            <svg v-if="toast.type === 'success'" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </div>
+          <div>
+            <h4 class="text-sm font-bold">{{ toast.title }}</h4>
+            <p class="text-xs opacity-80 mt-0.5">{{ toast.message }}</p>
+          </div>
+        </div>
+      </transition>
     </main>
   </div>
 </template>
@@ -1113,21 +1165,21 @@ const router = useRouter();
 
 const settingsData = reactive({
   security: {
-    username: JSON.parse(localStorage.getItem('admin_credentials'))?.username || 'Dev_Joms',
+    username: '',
     oldPassword: '',
     newPassword: '',
     confirmPassword: ''
   },
   social: {
-    gmail: JSON.parse(localStorage.getItem('portfolio_settings'))?.social?.gmail || 'yourname@gmail.com',
-    linkedin: JSON.parse(localStorage.getItem('portfolio_settings'))?.social?.linkedin || 'https://linkedin.com/in/yourname',
-    github: JSON.parse(localStorage.getItem('portfolio_settings'))?.social?.github || 'https://github.com/yourname',
-    instagram: JSON.parse(localStorage.getItem('portfolio_settings'))?.social?.instagram || 'https://instagram.com/yourname',
-    facebook: JSON.parse(localStorage.getItem('portfolio_settings'))?.social?.facebook || 'https://facebook.com/yourname',
-    viber: JSON.parse(localStorage.getItem('portfolio_settings'))?.social?.viber || '+1234567890'
+    gmail: '',
+    linkedin: '',
+    github: '',
+    instagram: '',
+    facebook: '',
+    viber: ''
   },
   portfolio: {
-    aboutImages: JSON.parse(localStorage.getItem('portfolio_settings'))?.portfolio?.aboutImages || []
+    aboutImages: []
   }
 });
 
@@ -1152,6 +1204,26 @@ const pendingRequestAction = reactive({
   id: null,
   status: '',
 });
+
+// Toast state and methods
+const toast = reactive({
+  visible: false,
+  title: '',
+  message: '',
+  type: 'success'
+});
+let toastTimeout;
+
+const showToast = (title, message, type = 'success') => {
+  toast.title = title;
+  toast.message = message;
+  toast.type = type;
+  toast.visible = true;
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => {
+    toast.visible = false;
+  }, 3000);
+};
 
 watch(activeTab, (newTab) => {
   searchQuery.value = '';
@@ -1200,28 +1272,53 @@ const certs = ref([]);
 const stacks = ref([]);
 const featuredWorks = ref([]);
 const featuredCerts = ref([]);
+const featuredStacks = ref([]);
 
 const isFeatured = (id) => {
   if (activeTab.value === 'Works') return featuredWorks.value.includes(id);
   if (activeTab.value === 'Certs') return featuredCerts.value.includes(id);
+  if (activeTab.value === 'Stacks') return featuredStacks.value.includes(id);
   return false;
 };
 
-const toggleFeatured = (item) => {
-  const arr = activeTab.value === 'Works' ? featuredWorks : featuredCerts;
-  const idx = arr.value.indexOf(item.id);
-  if (idx !== -1) {
-    arr.value.splice(idx, 1);
-  } else {
-    if (arr.value.length >= 3) {
-      alert('You can only feature up to 3 items. Remove one first.');
+const toggleFeatured = async (idOrItem) => {
+  const id = typeof idOrItem === 'object' ? idOrItem.id : idOrItem;
+  const target = activeTab.value === 'Works' ? featuredWorks : (activeTab.value === 'Certs' ? featuredCerts : featuredStacks);
+  const index = target.value.indexOf(id);
+  let isFeaturedVal = false;
+
+  if (index === -1) {
+    // Limit of 3 ONLY for Works and Certs
+    if ((activeTab.value === 'Works' || activeTab.value === 'Certs') && target.value.length >= 3) {
+      showToast('Limit Reached', `You can only feature up to 3 items in the showcase for this category.`, 'error');
       return;
     }
-    arr.value.push(item.id);
+    target.value.push(id);
+    isFeaturedVal = true;
+  } else {
+    target.value.splice(index, 1);
+    isFeaturedVal = false;
   }
-  // Auto-save featured selections immediately
-  localStorage.setItem('portfolio_featured_works', JSON.stringify(featuredWorks.value));
-  localStorage.setItem('portfolio_featured_certs', JSON.stringify(featuredCerts.value));
+
+  if (['Works', 'Certs', 'Stacks'].includes(activeTab.value)) {
+    const endpoint = activeTab.value === 'Works' ? '/works' : (activeTab.value === 'Certs' ? '/certificates' : '/stacks');
+    const targetArray = activeTab.value === 'Works' ? works : (activeTab.value === 'Certs' ? certs : stacks);
+    
+    try {
+      const item = targetArray.value.find(i => i.id === id);
+      if (item) {
+        // Send as 1 or 0 for database compatibility
+        await axios.put(`${endpoint}/${id}`, { 
+          ...item, 
+          is_featured: isFeaturedVal ? 1 : 0 
+        });
+        item.is_featured = isFeaturedVal ? 1 : 0;
+      }
+    } catch (error) {
+      console.error(`Error updating featured status for ${activeTab.value}:`, error);
+      showToast('Error', 'Failed to update featured status in database.', 'error');
+    }
+  }
 };
 
 const activeItems = computed(() => {
@@ -1245,50 +1342,28 @@ const filteredItems = computed(() => {
 
 const resumeData = reactive({
   basicInfo: {
-    name: 'JHO MARI MATUGUINAS MALACA',
-    address: '1445 New Site Street, San Gabriel, Santa Maria, Bulacan',
-    contact: '09657109042',
-    email: 'jhomarimalaca1@gmail.com',
+    name: '',
+    address: '',
+    contact: '',
+    email: '',
     profileImageLight: '',
     profileImageDark: '',
     resumePdf: ''
   },
-  careerObjective: 'To contribute to a progressive organization by applying knowledge, developing new skills, and supporting the achievement of organizational goals while building a strong foundation for long-term professional growth.',
-  educationalBackground: [
-    { level: 'Tertiary:', school: 'STI College Sta. Maria', course: 'Bachelor of Science in Information Technology', address: 'Poblacion, Santa Maria, Bulacan', year: '2022-2025' }
-  ],
-  skills: [
-    'Problem-Solving and Analytical Thinking',
-    'Critical Thinking',
-    'Team Collaboration and Communication',
-    'Eagerness to Learn and Improve',
-    'Programming (Java, C#, Python, PHP)',
-    'Web Development (HTML, CSS, Laravel, Django)',
-    'Database Management (MySQL)',
-    'Software and Hardware Installation'
-  ],
-  trainings: [
-    { name: 'SAP University Alliance', date_issued: '2024', issuer: 'STI College Sta. Maria' },
-    { name: 'Java Fundamentals', date_issued: '2023', issuer: 'STI College Sta. Maria' },
-    { name: 'System Administration', date_issued: '2023', issuer: 'STI College Sta. Maria' }
-  ],
-  workExperience: [
-    { company: 'Jollibee Sta. Maria Highway', address: 'Bypass Road, Sta. Clara, Sta. Maria, Bulacan', position: 'Crew', year: '2022-2025' },
-    { company: 'Software House / SGK', address: 'Poblacion, Santa Maria, Bulacan', position: 'Junior Technician', year: '2020- 2022' }
-  ],
+  careerObjective: '',
+  educationalBackground: [],
+  skills: [],
+  trainings: [],
+  workExperience: [],
   personalInfo: {
-    age: '25 Years Old',
-    dob: 'October 01, 2000',
-    sex: 'Male',
-    citizenship: 'Filipino',
-    civilStatus: 'Single',
-    religion: 'Roman Catholic'
+    age: '',
+    dob: '',
+    sex: '',
+    citizenship: '',
+    civilStatus: '',
+    religion: ''
   },
-  references: [
-    { name: 'Mr. Alfie B. Benito, MIT', company: 'STI College Sta. Maria', position: 'Assistant Professor', email: 'Alfiebernardobenito@gmail.com', contact: '09774767391' },
-    { name: 'Ms. Reymalyn Villanueva Obar', company: 'Jollibee Waltermart Guiguinto', position: 'Assistant Restaurant Manager 2', email: 'reymalynobar@gmail.com', contact: '09999182293' },
-    { name: 'Mr. Jhoselle Tus, Phd, DPA', company: 'Jesus Is Lord College Inc.', position: 'Professor', email: 'Profjo@gmail.com', contact: '09750918100' }
-  ]
+  references: []
 });
 
 const skillsText = computed({
@@ -1301,9 +1376,14 @@ const addWorkExp = () => resumeData.workExperience.push({company: '', position: 
 const addTraining = () => resumeData.trainings.push({name: '', date_issued: '', issuer: ''});
 const addReference = () => resumeData.references.push({name: '', company: '', position: '', email: '', contact: ''});
 
-const saveResume = () => {
-  localStorage.setItem('portfolio_resume', JSON.stringify(resumeData));
-  alert('Resume saved successfully to LocalStorage!');
+const saveResume = async () => {
+  try {
+    await axios.post('/resume', resumeData);
+    showToast('Success', 'Resume data saved successfully to database!', 'success');
+  } catch (error) {
+    console.error('Error saving resume:', error);
+    showToast('Error', 'Failed to save resume to database.', 'error');
+  }
 };
 
 const form = reactive({
@@ -1383,7 +1463,7 @@ const handleFileUpload = (e, target) => {
       }, 500);
     }).catch(error => {
       console.error('Upload Error:', error);
-      alert(`Upload failed for ${file.name}. Please check file type and size.`);
+      showToast('Error', `Upload failed for ${file.name}. Please check file type and size.`, 'error');
       currentUploads.value = currentUploads.value.filter(u => u.id !== uploadId);
     });
   });
@@ -1466,32 +1546,106 @@ const updateResumeRequestStatus = async (request, status) => {
   }
 };
 
-const loadData = () => {
-  const storedWorks = localStorage.getItem('portfolio_works');
-  const storedCerts = localStorage.getItem('portfolio_certs');
-  const storedStacks = localStorage.getItem('portfolio_stacks');
-  const storedResume = localStorage.getItem('portfolio_resume');
-  const storedFeaturedWorks = localStorage.getItem('portfolio_featured_works');
-  const storedFeaturedCerts = localStorage.getItem('portfolio_featured_certs');
-
-  works.value = storedWorks ? JSON.parse(storedWorks) : [];
-  certs.value = storedCerts ? JSON.parse(storedCerts) : [];
-  stacks.value = storedStacks ? JSON.parse(storedStacks) : [];
-  featuredWorks.value = storedFeaturedWorks ? JSON.parse(storedFeaturedWorks) : [];
-  featuredCerts.value = storedFeaturedCerts ? JSON.parse(storedFeaturedCerts) : [];
-
-  if (storedResume) {
-    const parsed = JSON.parse(storedResume);
-    const currentBasic = { ...resumeData.basicInfo };
-    Object.assign(resumeData, parsed);
-    if (parsed.basicInfo) {
-      resumeData.basicInfo = { ...currentBasic, ...parsed.basicInfo };
+const fetchResume = async () => {
+  try {
+    const response = await axios.get('/resume');
+    if (response.data && response.data.basicInfo) {
+      // Merge data carefully
+      const currentBasic = { ...resumeData.basicInfo };
+      Object.assign(resumeData, response.data);
+      resumeData.basicInfo = { ...currentBasic, ...response.data.basicInfo };
     }
+  } catch (error) {
+    console.error('Unable to load resume from database:', error);
+  }
+};
+
+const loadData = () => {
+  // Logic removed to ensure data is strictly database-driven.
+};
+
+const fetchWorks = async () => {
+  try {
+    const response = await axios.get('/works');
+    works.value = response.data;
+    // Sync featuredWorks from database
+    featuredWorks.value = response.data
+      .filter(w => w.is_featured)
+      .map(w => w.id);
+  } catch (error) {
+    console.error('Unable to load works:', error);
+  }
+};
+
+const fetchCerts = async () => {
+  try {
+    const response = await axios.get('/certificates');
+    certs.value = response.data;
+    // Sync featuredCerts from database
+    featuredCerts.value = response.data
+      .filter(c => c.is_featured)
+      .map(c => c.id);
+  } catch (error) {
+    console.error('Unable to load certificates:', error);
+  }
+};
+
+const fetchStacks = async () => {
+  try {
+    const response = await axios.get('/stacks');
+    stacks.value = response.data;
+    // Sync featuredStacks from database
+    featuredStacks.value = response.data
+      .filter(s => s.is_featured)
+      .map(s => s.id);
+  } catch (error) {
+    console.error('Unable to load stacks:', error);
+  }
+};
+
+const fetchAboutImages = async () => {
+  try {
+    const response = await axios.get('/about-images');
+    settingsData.portfolio.aboutImages = response.data.map(img => ({
+      data: img.image,
+      id: img.id
+    }));
+  } catch (error) {
+    console.error('Unable to load about images:', error);
+  }
+};
+
+const fetchSocialLinks = async () => {
+  try {
+    const response = await axios.get('/social-links');
+    if (response.data && response.data.id) {
+      Object.assign(settingsData.social, response.data);
+    }
+  } catch (error) {
+    console.error('Unable to load social links:', error);
+  }
+};
+
+const fetchAdminSecurity = async () => {
+  try {
+    const response = await axios.get('/admin-security');
+    if (response.data && response.data.username) {
+      settingsData.security.username = response.data.username;
+    }
+  } catch (error) {
+    console.error('Unable to load admin security:', error);
   }
 };
 
 onMounted(() => {
   loadData();
+  fetchResume();
+  fetchWorks();
+  fetchCerts();
+  fetchStacks();
+  fetchAboutImages();
+  fetchSocialLinks();
+  fetchAdminSecurity();
   fetchResumeRequests();
 });
 
@@ -1529,108 +1683,164 @@ const editItem = (item) => {
   form.cert_file = item.cert_file || null;
 };
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   const currentArray = activeTab.value === 'Works' ? works : activeTab.value === 'Certs' ? certs : stacks;
   
   const newItem = {
-    id: selectedId.value || Date.now(),
     title: form.title,
-    name: form.title, // Support both naming styles
+    name: form.title, // Support name field for stacks
     description: form.description,
     summary: form.summary,
     features: form.features,
-    image: form.image,
     link: form.link,
     github_link: form.github_link,
     stacks: form.stacks,
     issuer: form.issuer,
     year_issued: form.year_issued,
     category: form.category,
+    image: form.image, // For stacks
     files: JSON.parse(JSON.stringify(form.files)), // Deep copy
-    cert_file: form.cert_file ? JSON.parse(JSON.stringify(form.cert_file)) : null
+    cert_file: form.cert_file ? JSON.parse(JSON.stringify(form.cert_file)) : null,
+    is_featured: activeTab.value === 'Works' 
+      ? featuredWorks.value.includes(selectedId.value) 
+      : activeTab.value === 'Certs' 
+        ? featuredCerts.value.includes(selectedId.value) 
+        : false
   };
 
-  if (selectedId.value) {
-    const index = currentArray.value.findIndex(i => i.id === selectedId.value);
-    if (index !== -1) currentArray.value[index] = newItem;
-  } else {
-    currentArray.value.push(newItem);
+  const endpointMap = {
+    'Works': '/works',
+    'Certs': '/certificates',
+    'Stacks': '/stacks'
+  };
+  
+  const arrayMap = {
+    'Works': works,
+    'Certs': certs,
+    'Stacks': stacks
+  };
+
+  if (endpointMap[activeTab.value]) {
+    const endpoint = endpointMap[activeTab.value];
+    const targetArray = arrayMap[activeTab.value];
+    
+    try {
+      if (selectedId.value) {
+        const response = await axios.put(`${endpoint}/${selectedId.value}`, newItem);
+        const index = targetArray.value.findIndex(i => i.id === selectedId.value);
+        if (index !== -1) targetArray.value[index] = response.data;
+      } else {
+        const response = await axios.post(endpoint, newItem);
+        targetArray.value.push(response.data);
+      }
+      resetForm();
+      showToast('Success', `${activeTab.value} saved successfully to database!`, 'success');
+    } catch (error) {
+      console.error(`Error saving ${activeTab.value}:`, error);
+      showToast('Error', `Failed to save ${activeTab.value} to database.`, 'error');
+    }
   }
-
-  resetForm();
-  saveAll();
 };
 
-const deleteItem = (id) => {
-  const currentArray = activeTab.value === 'Works' ? works : activeTab.value === 'Certs' ? certs : stacks;
-  currentArray.value = currentArray.value.filter(i => i.id !== id);
-  if (selectedId.value === id) resetForm();
-  saveAll();
-};
+const deleteItem = async (id) => {
+  if (!confirm('Are you sure you want to delete this item?')) return;
 
-const updateAccountSecurity = () => {
-  const adminAuth = JSON.parse(localStorage.getItem('admin_credentials')) || {
-    username: 'Dev_Joms',
-    password: 'Tsuitachi_01'
+  const endpointMap = {
+    'Works': '/works',
+    'Certs': '/certificates',
+    'Stacks': '/stacks'
+  };
+  
+  const arrayMap = {
+    'Works': works,
+    'Certs': certs,
+    'Stacks': stacks
   };
 
-  if (settingsData.security.oldPassword !== adminAuth.password) {
-    alert('Invalid current password!');
+  if (endpointMap[activeTab.value]) {
+    const endpoint = endpointMap[activeTab.value];
+    const targetArray = arrayMap[activeTab.value];
+    const featuredArray = activeTab.value === 'Works' ? featuredWorks : (activeTab.value === 'Certs' ? featuredCerts : null);
+
+    try {
+      await axios.delete(`${endpoint}/${id}`);
+      targetArray.value = targetArray.value.filter(i => i.id !== id);
+      if (featuredArray) {
+        featuredArray.value = featuredArray.value.filter(fid => fid !== id);
+      }
+    } catch (error) {
+      console.error(`Error deleting ${activeTab.value}:`, error);
+      showToast('Error', `Failed to delete ${activeTab.value} from database.`, 'error');
+    }
+  }
+  if (selectedId.value === id) resetForm();
+};
+
+const updateAccountSecurity = async () => {
+  if (settingsData.security.newPassword && settingsData.security.newPassword !== settingsData.security.confirmPassword) {
+    showToast('Error', 'New passwords do not match!', 'error');
     return;
   }
 
-  // Determine what we're changing
-  let updatedUsername = settingsData.security.username || adminAuth.username;
-  let updatedPassword = adminAuth.password;
+  try {
+    const response = await axios.post('/admin-security', {
+      username: settingsData.security.username,
+      oldPassword: settingsData.security.oldPassword,
+      newPassword: settingsData.security.newPassword || null
+    });
 
-  if (settingsData.security.newPassword) {
-    if (settingsData.security.newPassword !== settingsData.security.confirmPassword) {
-      alert('New passwords do not match!');
-      return;
+    // Update localStorage credentials for frontend "login" persistence
+    const currentCreds = JSON.parse(localStorage.getItem('admin_credentials')) || {};
+    currentCreds.username = response.data.username;
+    // We update the password in localStorage to maintain the "logged in" state
+    if (settingsData.security.newPassword) {
+      currentCreds.password = settingsData.security.newPassword;
     }
-    updatedPassword = settingsData.security.newPassword;
+    localStorage.setItem('admin_credentials', JSON.stringify(currentCreds));
+
+    // Clear sensitive fields
+    settingsData.security.oldPassword = '';
+    settingsData.security.newPassword = '';
+    settingsData.security.confirmPassword = '';
+
+    showToast('Success', 'Security credentials updated successfully in database!', 'success');
+  } catch (error) {
+    console.error('Error updating security credentials:', error);
+    const message = error.response?.data?.message || 'Failed to update security credentials.';
+    showToast('Error', message, 'error');
   }
-
-  // Update credentials
-  const newCredentials = {
-    username: updatedUsername,
-    password: updatedPassword
-  };
-
-  localStorage.setItem('admin_credentials', JSON.stringify(newCredentials));
-  
-  // Clear sensitive fields
-  settingsData.security.oldPassword = '';
-  settingsData.security.newPassword = '';
-  settingsData.security.confirmPassword = '';
-
-  alert('Security credentials updated successfully!');
 };
 
-const updateSettings = () => {
-  localStorage.setItem('portfolio_settings', JSON.stringify(settingsData));
-  alert('Settings saved successfully!');
+const updateSettings = async () => {
+  try {
+    // Save about images to database
+    await axios.post('/about-images', {
+      images: settingsData.portfolio.aboutImages
+    });
+    
+    // Save social links to database
+    await axios.post('/social-links', settingsData.social);
+    
+    // localStorage.setItem('portfolio_settings', JSON.stringify(settingsData));
+    showToast('Success', 'Settings, Social Links, and Gallery saved successfully to database!', 'success');
+  } catch (error) {
+    console.error('Error saving settings:', error);
+    showToast('Error', 'Failed to save settings to database.', 'error');
+  }
 };
 
-const saveAll = () => {
-  localStorage.setItem('portfolio_works', JSON.stringify(works.value));
-  localStorage.setItem('portfolio_certs', JSON.stringify(certs.value));
-  localStorage.setItem('portfolio_stacks', JSON.stringify(stacks.value));
-  localStorage.setItem('portfolio_featured_works', JSON.stringify(featuredWorks.value));
-  localStorage.setItem('portfolio_featured_certs', JSON.stringify(featuredCerts.value));
-  localStorage.setItem('portfolio_settings', JSON.stringify(settingsData));
-  
-  // Handle Password logic if changing
-  if (activeTab.value === 'Settings' && settingsData.security.newPassword) {
-    if (settingsData.security.newPassword !== settingsData.security.confirmPassword) {
-      alert('New passwords do not match!');
-      return;
-    }
-    // In a real app, you'd verify old password here via API
-    alert('Password change initiated (Verification would happen on backend)');
+const saveAll = async () => {
+  if (activeTab.value === 'Resume') {
+    await saveResume();
+  } else if (activeTab.value === 'Settings') {
+    await updateSettings();
+    await updateAccountSecurity();
+  } else if (activeTab.value === 'Works' || activeTab.value === 'Certs' || activeTab.value === 'Stacks') {
+    // These are handled by individual handleSubmit but we can trigger a sync if needed
+    showToast('Info', 'Items are saved individually via the form.', 'success');
+  } else {
+    showToast('Success', 'Changes saved successfully!', 'success');
   }
-
-  alert('Changes saved successfully to LocalStorage!');
 };
 
 const logout = () => {
@@ -1640,6 +1850,14 @@ const logout = () => {
 </script>
 
 <style scoped>
+.toast-enter-active, .toast-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.toast-enter-from, .toast-leave-to {
+  opacity: 0;
+  transform: translateY(20px) scale(0.9);
+}
+
 .scroll-hide::-webkit-scrollbar {
   display: none;
 }

@@ -68,23 +68,33 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import axios from 'axios';
 
 const router = useRouter();
 const username = ref('');
 const password = ref('');
 const errorMsg = ref('');
 
-const handleLogin = () => {
-    const adminAuth = JSON.parse(localStorage.getItem('admin_credentials')) || {
-        username: 'Dev_Joms',
-        password: 'Tsuitachi_01'
-    };
+const handleLogin = async () => {
+    errorMsg.value = '';
+    try {
+        const response = await axios.post('/admin-login', {
+            username: username.value,
+            password: password.value
+        });
 
-    if (username.value === adminAuth.username && password.value === adminAuth.password) {
-        sessionStorage.setItem('admin_auth', 'true');
-        router.push('/admin');
-    } else {
-        errorMsg.value = 'Invalid username or password.';
+        if (response.data.success) {
+            sessionStorage.setItem('admin_auth', 'true');
+            // Update localStorage for other parts of the app that might still check it
+            localStorage.setItem('admin_credentials', JSON.stringify({
+                username: username.value,
+                password: password.value
+            }));
+            router.push('/admin');
+        }
+    } catch (error) {
+        console.error('Login failed:', error);
+        errorMsg.value = error.response?.data?.message || 'Invalid username or password.';
     }
 };
 </script>

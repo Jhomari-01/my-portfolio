@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('stacks', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('category');
-            $table->text('image')->nullable();
-            $table->timestamps();
+        Schema::table('resumes', function (Blueprint $table) {
+            $table->json('skills')->nullable();
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('stacks');
+        Schema::table('resumes', function (Blueprint $table) {
+            $table->dropColumn('skills');
+        });
     }
 };

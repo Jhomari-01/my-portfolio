@@ -80,12 +80,13 @@
         <div class="flex flex-col gap-6 items-center py-6 mt-2 overflow-y-auto max-h-[300px] scroll-hide">
             <a v-for="social in socials" :key="social.name" :href="social.link" target="_blank"
               :class="[
-                'group relative transition-all duration-500 hover:scale-150 rounded-xl flex-shrink-0', 
-                isDark ? 'text-gray-600' : 'text-gray-400',
+                'group relative transition-all duration-500 rounded-xl flex-shrink-0', 
+                activeSocialName === social.name ? 'scale-150 ' + (social.name === 'GitHub' ? (isDark ? 'text-white' : 'text-black') : social.hoverColor.replace('hover:', '')) : (isDark ? 'text-gray-600' : 'text-gray-400'),
+                'hover:scale-150',
                 social.name === 'GitHub' ? (isDark ? 'hover:text-white' : 'hover:text-black') : social.hoverColor
               ]"
             >
-                <div v-html="social.iconSVG" class="w-5 h-5 transition-all duration-500 group-hover:rotate-12"></div>
+                <div v-html="social.iconSVG" :class="['w-5 h-5 transition-all duration-500 group-hover:rotate-12', activeSocialName === social.name ? 'rotate-12' : '']"></div>
             </a>
         </div>
       </div>
@@ -161,8 +162,10 @@
         <!-- Top Navigation (Compact) -->
         <nav :class="['flex items-center justify-between z-10', windowWidth < 1024 ? 'px-6 py-4' : 'px-10 py-4 lg:py-6']">
           <div class="flex items-center gap-4 lg:gap-6">
-            <!-- Logo -->
-            <div :class="['flex items-center font-bold text-xl lg:text-2xl tracking-tighter transition-colors', isDark ? 'text-white' : 'text-black']">
+            <div 
+              @click="activeMainTab = 'Portfolio'; portfolioMode = 'scroll'; scrollToSection('Home')" 
+              :class="['flex items-center font-bold text-xl lg:text-2xl tracking-tighter transition-all cursor-pointer hover:scale-110 active:scale-95', isDark ? 'text-white' : 'text-black']"
+            >
               <span>J</span>
               <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-indigo-600">O</span>
               <span>Ms</span>
@@ -179,9 +182,15 @@
             </div>
           </div>
 
-          <div class="flex items-center gap-3 lg:gap-6">
+          <div v-if="activeMainTab === 'Portfolio' && portfolioMode !== 'scroll'" class="absolute left-1/2 -translate-x-1/2 flex items-center pointer-events-none">
+              <h2 class="text-xl lg:text-3xl font-black whitespace-nowrap text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-indigo-600">
+                {{ portfolioMode === 'Works' ? 'My Works' : (portfolioMode === 'Certificates' ? 'Certifications' : 'Tech Stacks') }}
+              </h2>
+          </div>
+
+          <div class="flex items-center gap-3 lg:gap-6 flex-1 justify-end">
               <!-- Standardized Sliding Navigation (Symmetry Fix) -->
-              <div v-if="activeMainTab === 'Portfolio'" :class="['flex items-center p-1 rounded-full relative overflow-hidden transition-all duration-500', isDark ? 'bg-white/[0.03] border border-white/5 shadow-inner' : 'bg-gray-100 shadow-inner']">
+              <div v-if="activeMainTab === 'Portfolio' && portfolioMode === 'scroll'" :class="['flex items-center p-1 rounded-full relative overflow-hidden transition-all duration-500', isDark ? 'bg-white/[0.03] border border-white/5 shadow-inner' : 'bg-gray-100 shadow-inner']">
                 
                 <!-- Sliding Indicator (Truly Global Slide - Hardware Accelerated) -->
                   <div 
@@ -201,9 +210,9 @@
                     :key="item.name"
                     @click="scrollToSection(item.name)"
                     :class="[
-                      'relative z-10 flex items-center justify-center gap-2 rounded-full transition-colors duration-500 h-9 lg:h-10',
+                      'relative z-10 flex items-center justify-center gap-2 rounded-full transition-all duration-500 h-9 lg:h-10',
                       windowWidth < 640 ? 'w-[50px]' : 'w-[100px]',
-                      activeNavItem === item.name ? 'text-white' : (isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-500 hover:text-black')
+                      activeNavItem === item.name ? 'text-white' : (isDark ? 'text-gray-500 hover:text-gray-300 hover:scale-110 active:scale-95' : 'text-gray-500 hover:text-black hover:scale-110 active:scale-95')
                     ]"
                   >
                     <div 
@@ -243,6 +252,21 @@
                 </a>
               </div>
 
+              <div v-if="activeMainTab === 'Portfolio' && (portfolioMode === 'Works' || portfolioMode === 'Certificates')" :class="['flex items-center gap-1.5 p-1 rounded-xl border transition-colors mr-2', isDark ? 'bg-white/5 border-white/10' : 'bg-gray-100 border-gray-200']">
+                  <button 
+                    @click="portfolioMode === 'Works' ? worksViewMode = 'grid' : certsViewMode = 'grid'" 
+                    :class="['w-8 h-8 rounded-lg flex items-center justify-center transition-all', (portfolioMode === 'Works' ? worksViewMode : certsViewMode) === 'grid' ? 'bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-lg shadow-cyan-500/30' : 'text-gray-400 hover:text-gray-600']"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+                  </button>
+                  <button 
+                    @click="portfolioMode === 'Works' ? worksViewMode = 'list' : certsViewMode = 'list'" 
+                    :class="['w-8 h-8 rounded-lg flex items-center justify-center transition-all', (portfolioMode === 'Works' ? worksViewMode : certsViewMode) === 'list' ? 'bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-lg shadow-cyan-500/30' : 'text-gray-400 hover:text-gray-600']"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                  </button>
+              </div>
+
               <!-- Dark Mode Toggle (Unified Background) -->
               <button @click="isDark = !isDark" :class="['p-2.5 rounded-full transition-all duration-500 hover:rotate-90 hover:scale-125 shadow-sm active:scale-95 border transition-all', isDark ? 'bg-white/[0.03] border-white/5 text-yellow-400 hover:bg-white/10' : 'bg-gray-100 border-transparent text-gray-400 hover:bg-gray-200 hover:text-black']">
                   <svg v-if="!isDark" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
@@ -254,7 +278,20 @@
         <!-- Content Views -->
         <!-- Content Views (Scrollable Portfolio) -->
         <div class="flex-1 relative overflow-hidden flex flex-col">
+          <!-- Global Detailed View Back Button (Sticky) -->
+          <button 
+            v-if="activeMainTab === 'Portfolio' && portfolioMode !== 'scroll'"
+            @click="scrollToSection('Home')" 
+            :class="['absolute top-4 left-6 lg:left-10 w-12 h-12 rounded-full flex items-center justify-center transition-all z-50 group shadow-xl', 
+              isDark ? 'bg-white/5 text-white border border-white/10 hover:border-white/20' : 'bg-white text-black border border-gray-100 hover:border-gray-200',
+              portfolioMode === 'Certificates' ? 'hover:bg-indigo-500 hover:text-white' : 'hover:bg-cyan-500 hover:text-white'
+            ]"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 transition-transform group-hover:-translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+
           <transition name="fade-slide" mode="out-in">
+
             <!-- Portfolio Section -->
             <div v-if="activeMainTab === 'Portfolio'" key="portfolio" class="h-full flex flex-col">
               
@@ -356,7 +393,7 @@
                   </section>
 
                   <!-- About Section -->
-                  <section id="About" class="min-h-full flex flex-col justify-center px-6 lg:px-24 py-12">
+                  <section id="About" class="min-h-full flex flex-col justify-center px-6 lg:px-24 py-12 reveal-on-scroll">
                     <div class="max-w-6xl w-full flex flex-col md:flex-row items-center gap-16 mr-auto">
                       <!-- Left Side: Text and Metrics -->
                       <div class="flex-1 max-w-2xl">
@@ -415,7 +452,7 @@
                       <div class="flex-shrink-0 w-72 lg:w-96 flex justify-center items-center">
                         <div class="relative group">
                           <!-- Rotating Background Orbits (Restored Circular) -->
-                          <div class="absolute inset-0 rounded-full border-2 border-dashed border-cyan-500/50 animate-[spin_20s_linear_infinite] shadow-[0_0_15px_rgba(6,182,212,0.1)]"></div>
+                          <div class="absolute -inset-4 rounded-full border-2 border-dashed border-cyan-500/50 animate-[spin_20s_linear_infinite] shadow-[0_0_15px_rgba(6,182,212,0.1)]"></div>
                           <div class="absolute -inset-8 rounded-full border border-indigo-500/40 animate-[spin_30s_linear_infinite_reverse] shadow-[0_0_20px_rgba(99,102,241,0.1)]"></div>
                           
                           <!-- Image Card -->
@@ -445,7 +482,7 @@
                   </section>
 
                   <!-- Showcase Summary Dashboard -->
-                  <section id="Showcase" class="min-h-full flex flex-col justify-center px-6 lg:px-12 py-8 relative">
+                  <section id="Showcase" class="min-h-full flex flex-col justify-center px-6 lg:px-12 py-8 relative reveal-on-scroll">
                     <div class="text-center mb-5">
                        <h2 :class="['text-4xl font-black transition-colors mb-4', isDark ? 'text-white' : 'text-black']">
                           My <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-indigo-600">Showcase</span>
@@ -478,7 +515,7 @@
                       <transition name="fade-slide" mode="out-in">
                         <!-- Works Tab Preview -->
                         <div v-if="showcaseTab === 'Works'" key="works-preview" class="space-y-12">
-                          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          <div v-if="featuredProjects.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div v-for="project in featuredProjects" :key="project.id || project.title" @click="project.link ? window.open(project.link, '_blank') : null" :class="['p-8 rounded-[32px] border transition-all duration-500 group relative overflow-hidden', project.link ? 'cursor-pointer hover:-translate-y-2' : '', isDark ? 'bg-white/5 border-white/10 hover:border-cyan-500/30' : 'bg-white border-gray-200 shadow-md shadow-black/[0.06] hover:shadow-xl hover:border-cyan-300']">
                               <!-- Gradient accent line -->
                               <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -517,6 +554,13 @@
                             </div>
 
                           </div>
+                          <div v-else class="py-24 flex flex-col items-center justify-center border-2 border-dashed border-white/5 rounded-[40px] bg-white/[0.01] animate-fade-in">
+                            <div class="w-16 h-16 rounded-full bg-cyan-500/10 flex items-center justify-center text-cyan-500/40 mb-5">
+                               <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                            </div>
+                            <p class="text-gray-500 font-bold text-sm">No projects currently featured.</p>
+                            <p class="text-[10px] text-gray-600 uppercase tracking-[0.2em] mt-1 font-black">Feature items in your admin panel to show them here.</p>
+                          </div>
                           <div class="flex justify-center">
                             <button @click="portfolioMode = 'Works'; activeNavItem = 'Showcase'" class="group flex items-center gap-3 px-10 py-5 bg-cyan-500/10 text-cyan-500 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-cyan-500 hover:text-white transition-all">
                               See All Works <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
@@ -526,7 +570,7 @@
 
                         <!-- Certificates Tab Preview -->
                         <div v-else-if="showcaseTab === 'Certificates'" key="certs-preview" class="space-y-12">
-                          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          <div v-if="featuredCertificates.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div v-for="cert in featuredCertificates" :key="cert.title" @click="selectedProject = cert" :class="['p-6 rounded-[28px] border transition-all duration-500 group hover:-translate-y-1 text-left cursor-pointer relative overflow-hidden', isDark ? 'bg-white/5 border-white/10 hover:border-indigo-500/30' : 'bg-white border-gray-100 shadow-md shadow-black/[0.06] hover:shadow-xl hover:border-indigo-300']">
                               <!-- Gradient accent line -->
                               <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -545,6 +589,13 @@
                               <p :class="['text-xs leading-relaxed line-clamp-3', isDark ? 'text-gray-500' : 'text-gray-400']">{{ cert.description || 'Verified certification for excellence in software development.' }}</p>
                             </div>
                           </div>
+                          <div v-else class="py-24 flex flex-col items-center justify-center border-2 border-dashed border-white/5 rounded-[40px] bg-white/[0.01] animate-fade-in">
+                            <div class="w-16 h-16 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-500/40 mb-5">
+                               <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+                            </div>
+                            <p class="text-gray-500 font-bold text-sm">No certifications currently featured.</p>
+                            <p class="text-[10px] text-gray-600 uppercase tracking-[0.2em] mt-1 font-black">Feature items in your admin panel to show them here.</p>
+                          </div>
 
                           <div class="flex justify-center">
                             <button @click="portfolioMode = 'Certificates'; activeNavItem = 'Showcase'" class="group flex items-center gap-3 px-10 py-5 bg-indigo-500/10 text-indigo-500 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-indigo-500 hover:text-white transition-all">
@@ -553,20 +604,27 @@
                           </div>
                         </div>
 
-                         <!-- Stack Tab Preview -->
-                         <div v-else-if="showcaseTab === 'Stack'" key="stack-preview" class="space-y-16">
-                           <div class="flex flex-wrap justify-center gap-12">
-                             <div v-for="skill in techStacks" :key="skill.name"
-                                   class="flex flex-col items-center gap-1.5 transition-all duration-500 hover:scale-110 group cursor-default">
-                                 <!-- Icon/Indicator -->
-                                 <div class="w-12 h-12 flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 relative">
-                                   <svg v-if="!skill.image" xmlns="http://www.w3.org/2000/svg" :class="['w-7 h-7 transition-all duration-500', isDark ? 'text-white/20 group-hover:text-cyan-500 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]' : 'text-gray-300 group-hover:text-cyan-500 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]']" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="12" x="3" y="4" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
-                                   <img v-else :src="skill.image" class="w-8 h-8 object-contain transition-all duration-500 grayscale group-hover:grayscale-0 filter group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]" alt="Tech Logo" />
-                                 </div>
+                          <!-- Stack Tab Preview -->
+                          <div v-else-if="showcaseTab === 'Stack'" key="stack-preview" class="space-y-16">
+                            <div v-if="featuredStacks.length > 0" class="flex flex-wrap justify-center gap-12">
+                              <div v-for="skill in featuredStacks" :key="skill.name"
+                                    :class="['flex flex-col items-center gap-1.5 transition-all duration-500 group cursor-default', activeStackName === skill.name ? 'scale-110' : 'hover:scale-110']">
+                                  <!-- Icon/Indicator -->
+                                  <div :class="['w-12 h-12 flex items-center justify-center transition-all duration-500 relative', activeStackName === skill.name ? 'scale-110 rotate-12' : 'group-hover:scale-110 group-hover:rotate-12']">
+                                    <svg v-if="!skill.image" xmlns="http://www.w3.org/2000/svg" :class="['w-7 h-7 transition-all duration-500', isDark ? (activeStackName === skill.name ? 'text-cyan-500 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]' : 'text-white/20 group-hover:text-cyan-500 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]') : (activeStackName === skill.name ? 'text-cyan-500 drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'text-gray-300 group-hover:text-cyan-500 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]')]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="12" x="3" y="4" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+                                    <img v-else :src="skill.image" :class="['w-8 h-8 object-contain transition-all duration-500 filter', activeStackName === skill.name ? 'grayscale-0 drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'grayscale group-hover:grayscale-0 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]']" alt="Tech Logo" />
+                                  </div>
 
-                                 <span :class="['text-xs font-black tracking-[0.1em] uppercase transition-all duration-500', isDark ? 'text-white/20 group-hover:text-white' : 'text-gray-300 group-hover:text-black']">{{ skill.name }}</span>
-                             </div>
-                           </div>
+                                  <span :class="['text-xs font-black tracking-[0.1em] uppercase transition-all duration-500', isDark ? (activeStackName === skill.name ? 'text-white' : 'text-white/20 group-hover:text-white') : (activeStackName === skill.name ? 'text-black' : 'text-gray-300 group-hover:text-black')]">{{ skill.name }}</span>
+                              </div>
+                            </div>
+                            <div v-else class="py-24 flex flex-col items-center justify-center border-2 border-dashed border-white/5 rounded-[40px] bg-white/[0.01] animate-fade-in">
+                              <div class="w-16 h-16 rounded-full bg-cyan-500/10 flex items-center justify-center text-cyan-500/40 mb-5">
+                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
+                              </div>
+                              <p class="text-gray-500 font-bold text-sm">No tech stacks currently featured.</p>
+                              <p class="text-[10px] text-gray-600 uppercase tracking-[0.2em] mt-1 font-black">Feature items in your admin panel to show them here.</p>
+                            </div>
                           <div class="flex justify-center">
                             <button @click="portfolioMode = 'Stack'; activeNavItem = 'Showcase'" class="group flex items-center gap-3 px-10 py-5 bg-cyan-500/10 text-cyan-500 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-cyan-500 hover:text-white transition-all">
                               Explore Full Stack <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
@@ -578,7 +636,7 @@
                   </section>
 
                   <!-- Contact / Footer Section with Multiple Waves -->
-                  <section id="Contact" class="relative mt-16">
+                  <section id="Contact" class="relative mt-16 reveal-on-scroll">
                     
                     <!-- Section Header -->
                     <div class="text-center mb-8 pt-8 relative z-30">
@@ -747,22 +805,7 @@
                 <!-- Detailed Works View -->
                 <div v-else-if="portfolioMode === 'Works'" key="works" class="flex-1 overflow-y-auto px-10 py-16 scroll-hide relative">
                   <div class="max-w-5xl mx-auto">
-                    <div class="flex items-center gap-6 mb-16">
-                        <button @click="portfolioMode = 'scroll'; scrollToSection('Showcase')" :class="['w-12 h-12 rounded-full flex items-center justify-center transition-all hover:bg-cyan-500 hover:text-white', isDark ? 'bg-white/5 text-white' : 'bg-gray-100 text-black']">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                        </button>
-                        <h2 :class="['text-5xl font-black transition-colors flex-1', isDark ? 'text-white' : 'text-black']">My Works</h2>
-                        
-                        <!-- View Toggles -->
-                        <div :class="['flex items-center gap-2 p-1.5 rounded-2xl border transition-colors', isDark ? 'bg-white/5 border-white/10' : 'bg-gray-100 border-gray-200']">
-                           <button @click="worksViewMode = 'grid'" :class="['w-10 h-10 rounded-xl flex items-center justify-center transition-all', worksViewMode === 'grid' ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/30' : 'text-gray-400 hover:text-cyan-500']">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
-                           </button>
-                           <button @click="worksViewMode = 'list'" :class="['w-10 h-10 rounded-xl flex items-center justify-center transition-all', worksViewMode === 'list' ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/30' : 'text-gray-400 hover:text-cyan-500']">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                           </button>
-                        </div>
-                     </div>
+                    <!-- Header moved to Top Bar -->
                      <div :class="['transition-all duration-500', worksViewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-10' : 'space-y-6']">
                         <div v-for="project in projects" :key="project.id || project.title" @click="selectedProject = project" :class="['rounded-[28px] border transition-all duration-500 group cursor-pointer hover:-translate-y-1 flex relative overflow-hidden', worksViewMode === 'grid' ? 'flex-col p-8' : 'flex-col md:flex-row gap-8 items-center p-5', isDark ? 'bg-white/5 border-white/10 hover:border-cyan-500/30' : 'bg-white border-gray-200 shadow-md shadow-black/[0.04] hover:shadow-xl hover:border-cyan-300']">
                               <!-- Gradient accent lines -->
@@ -810,22 +853,7 @@
                 <!-- Detailed Certificates View -->
                 <div v-else-if="portfolioMode === 'Certificates'" key="certs" class="flex-1 overflow-y-auto px-10 py-16 scroll-hide relative">
                   <div class="max-w-5xl mx-auto text-center">
-                      <div class="flex items-center gap-6 mb-16 text-left">
-                        <button @click="portfolioMode = 'scroll'; scrollToSection('Showcase')" :class="['w-12 h-12 rounded-full flex items-center justify-center transition-all hover:bg-indigo-500 hover:text-white', isDark ? 'bg-white/5 text-white' : 'bg-gray-100 text-black']">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                        </button>
-                        <h2 :class="['text-5xl font-black transition-colors flex-1', isDark ? 'text-white' : 'text-black']">Certifications</h2>
-
-                        <!-- View Toggles -->
-                        <div :class="['flex items-center gap-2 p-1.5 rounded-2xl border transition-colors', isDark ? 'bg-white/5 border-white/10' : 'bg-gray-100 border-gray-200']">
-                           <button @click="certsViewMode = 'grid'" :class="['w-10 h-10 rounded-xl flex items-center justify-center transition-all', certsViewMode === 'grid' ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-400 hover:text-indigo-500']">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
-                           </button>
-                           <button @click="certsViewMode = 'list'" :class="['w-10 h-10 rounded-xl flex items-center justify-center transition-all', certsViewMode === 'list' ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-400 hover:text-indigo-500']">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                           </button>
-                        </div>
-                      </div>
+                    <!-- Header moved to Top Bar -->
                       
                       <div :class="['transition-all duration-500', certsViewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-3 gap-8' : 'space-y-6']">
                         <div v-for="cert in certificates" :key="cert.title" @click="selectedProject = cert" :class="['rounded-[28px] border transition-all duration-500 group hover:-translate-y-1 text-left relative overflow-hidden cursor-pointer flex', certsViewMode === 'grid' ? 'flex-col p-8' : 'flex-col md:flex-row gap-8 items-center p-5', isDark ? 'border-white/10 bg-white/5 hover:border-indigo-500/30' : 'border-gray-200 bg-white shadow-md shadow-black/[0.04] hover:shadow-xl hover:border-indigo-300']">
@@ -867,12 +895,7 @@
                 <!-- Detailed Stack View -->
                 <div v-else-if="portfolioMode === 'Stack'" key="stack" class="flex-1 overflow-y-auto px-10 py-16 scroll-hide relative">
                   <div class="max-w-5xl mx-auto">
-                      <div class="flex items-center gap-6 mb-16 text-left">
-                        <button @click="portfolioMode = 'scroll'; scrollToSection('Showcase')" :class="['w-12 h-12 rounded-full flex items-center justify-center transition-all hover:bg-cyan-500 hover:text-white', isDark ? 'bg-white/5 text-white' : 'bg-gray-100 text-black']">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                        </button>
-                        <h2 :class="['text-5xl font-black transition-colors', isDark ? 'text-white' : 'text-black']">Technical <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-indigo-600">Expertise</span></h2>
-                      </div>
+                    <!-- Header moved to Top Bar -->
                       
                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-20">
                          <div v-for="category in ['Frontend', 'Backend', 'Tools']" :key="category"
@@ -891,13 +914,16 @@
 
                           <div class="flex flex-wrap gap-8">
                             <div v-for="skill in techStacks.filter(s => s.category === category)" :key="skill.name"
-                                   class="flex flex-col items-center gap-1.5 transition-all duration-500 hover:scale-110 group cursor-default">
+                                   :class="['flex flex-col items-center gap-1.5 transition-all duration-500 group cursor-default', activeStackName === skill.name ? 'scale-110' : 'hover:scale-110']">
+
                                  <!-- Icon/Indicator -->
-                                 <div class="w-12 h-12 flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 relative">
-                                   <svg v-if="!skill.image" xmlns="http://www.w3.org/2000/svg" :class="['w-7 h-7 transition-all duration-500', isDark ? 'text-white/20 group-hover:text-cyan-500 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]' : 'text-gray-300 group-hover:text-cyan-500 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]']" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="12" x="3" y="4" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
-                                   <img v-else :src="skill.image" class="w-8 h-8 object-contain transition-all duration-500 grayscale group-hover:grayscale-0 filter group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]" alt="Tech Logo" />
+                                 <div :class="['w-12 h-12 flex items-center justify-center transition-all duration-500 relative', activeStackName === skill.name ? 'scale-110 rotate-12' : 'group-hover:scale-110 group-hover:rotate-12']">
+                                   <svg v-if="!skill.image" xmlns="http://www.w3.org/2000/svg" :class="['w-7 h-7 transition-all duration-500', isDark ? (activeStackName === skill.name ? 'text-cyan-500 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]' : 'text-white/20 group-hover:text-cyan-500 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]') : (activeStackName === skill.name ? 'text-cyan-500 drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'text-gray-300 group-hover:text-cyan-500 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]')]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="12" x="3" y="4" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+                                   <img v-else :src="skill.image" :class="['w-8 h-8 object-contain transition-all duration-500 filter', activeStackName === skill.name ? 'grayscale-0 drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'grayscale group-hover:grayscale-0 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]']" alt="Tech Logo" />
                                  </div>
-                                 <span :class="['text-xs font-black tracking-[0.1em] uppercase transition-all duration-500', isDark ? 'text-white/20 group-hover:text-white' : 'text-gray-300 group-hover:text-black']">{{ skill.name }}</span>
+
+                                 <span :class="['text-xs font-black tracking-[0.1em] uppercase transition-all duration-500', isDark ? (activeStackName === skill.name ? 'text-white' : 'text-white/20 group-hover:text-white') : (activeStackName === skill.name ? 'text-black' : 'text-gray-300 group-hover:text-black')]">{{ skill.name }}</span>
+
                             </div>
                           </div>
                         </div>
@@ -1379,76 +1405,6 @@
         </div>
       </div>
     </transition>
-     <!-- Chatbot Button & Window -->
-     <div class="fixed bottom-6 right-6 z-[1000] flex flex-col items-end gap-4">
-        <!-- Chat Window -->
-        <transition name="modal-fade">
-          <div v-if="isChatbotOpen" :class="['w-[320px] sm:w-[380px] h-[500px] rounded-[32px] border flex flex-col overflow-hidden shadow-2xl transition-all duration-500', isDark ? 'bg-[#0f1115]/95 border-white/10 backdrop-blur-2xl' : 'bg-white/95 border-gray-200 backdrop-blur-2xl']">
-             <!-- Chat Header -->
-             <div class="p-6 bg-gradient-to-r from-cyan-500/10 to-indigo-600/10 border-b border-white/5 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                   <div class="w-10 h-10 rounded-2xl bg-gradient-to-r from-cyan-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/30">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                   </div>
-                   <div>
-                      <h4 :class="['text-sm font-black transition-colors', isDark ? 'text-white' : 'text-black']">Portfilo Assistant</h4>
-                      <div class="flex items-center gap-1.5">
-                         <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                         <span class="text-[10px] font-bold text-green-500 uppercase tracking-tighter">Online</span>
-                      </div>
-                   </div>
-                </div>
-                <button @click="isChatbotOpen = false" :class="['p-2 rounded-xl transition-colors', isDark ? 'hover:bg-white/5 text-gray-500' : 'hover:bg-gray-100 text-gray-400']">
-                   <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                </button>
-             </div>
-
-             <!-- Chat Messages -->
-             <div id="chat-messages-container" class="flex-1 overflow-y-auto p-6 space-y-4 scroll-hide">
-                <div v-for="(msg, idx) in chatMessages" :key="idx" :class="['flex w-full', msg.role === 'user' ? 'justify-end' : 'justify-start']">
-                   <div :class="['max-w-[80%] rounded-2xl p-4 shadow-sm relative', msg.role === 'user' ? 'bg-gradient-to-r from-cyan-500 to-indigo-600 text-white rounded-tr-none' : (isDark ? 'bg-white/5 text-gray-300 border border-white/10 rounded-tl-none' : 'bg-gray-100 text-gray-700 rounded-tl-none')]">
-                      <p class="text-xs font-medium leading-relaxed">{{ msg.content }}</p>
-                      <span :class="['text-[9px] mt-2 block opacity-50 font-bold', msg.role === 'user' ? 'text-right' : '']">{{ msg.time }}</span>
-                   </div>
-                </div>
-             </div>
-
-             <!-- Chat Input -->
-             <div class="p-4 border-t border-white/5">
-                <form @submit.prevent="sendMessage" class="relative">
-                   <input 
-                      v-model="chatInput"
-                      type="text" 
-                      placeholder="Ask me anything..." 
-                      :class="['w-full py-3.5 pl-5 pr-14 rounded-2xl border text-xs font-bold transition-all outline-none', isDark ? 'bg-white/5 border-white/10 text-white focus:border-cyan-500/50' : 'bg-gray-50 border-gray-200 text-black focus:border-cyan-500/50']"
-                   >
-                   <button type="submit" :class="['absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 text-white flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-lg shadow-cyan-500/20', !chatInput.trim() ? 'opacity-50 cursor-not-allowed' : '']">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-                   </button>
-                </form>
-             </div>
-          </div>
-        </transition>
-
-        <!-- Chat Floating Button -->
-        <button 
-           @click="isChatbotOpen = !isChatbotOpen"
-           :class="[
-             'w-16 h-16 rounded-[24px] flex items-center justify-center transition-all duration-500 hover:scale-110 active:scale-95 group relative overflow-hidden border backdrop-blur-xl', 
-             !isChatbotOpen ? 'animate-[pulse_3s_infinite]' : '',
-             isChatbotOpen 
-               ? (isDark ? 'bg-white/10 border-white/10 rotate-90 shadow-[0_0_20px_rgba(255,255,255,0.05)]' : 'bg-black/10 border-black/10 rotate-90 shadow-lg')
-               : (isDark ? 'bg-[#1a1c22]/60 border-white/10 shadow-[0_0_20px_rgba(6,182,212,0.2)]' : 'bg-white/40 border-white/40 shadow-[0_10px_30px_rgba(34,211,238,0.15)]')
-           ]"
-        >
-           <!-- SVG Gradient Definition -->
-           <svg class="absolute w-0 h-0"><defs><linearGradient id="chatIconGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" /><stop offset="100%" style="stop-color:#4f46e5;stop-opacity:1" /></linearGradient></defs></svg>
-           
-           <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-           <svg v-if="!isChatbotOpen" xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 transition-all group-hover:-rotate-12" viewBox="0 0 24 24" fill="none" stroke="url(#chatIconGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-           <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" :class="isDark ? 'text-white' : 'text-indigo-600'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-        </button>
-     </div>
   </div>
 </template>
 
@@ -1459,8 +1415,49 @@ import axios from 'axios';
 const activeNavItem = ref('Home');
 const certs = ref([]);
 const worksViewMode = ref('grid');
-const certsViewMode = ref('grid');
+const certsViewMode = ref('list');
 const showcaseTab = ref('Works');
+const activeStackName = ref('');
+let stackAnimationInterval = null;
+
+const triggerStackWave = () => {
+  if (techStacks.value.length === 0) return;
+  
+  techStacks.value.forEach((skill, index) => {
+    setTimeout(() => {
+      activeStackName.value = skill.name;
+      
+      // Reset after a longer duration for a slower ripple
+      setTimeout(() => {
+        if (activeStackName.value === skill.name) {
+          activeStackName.value = '';
+        }
+      }, 1500); // Slower recession
+    }, index * 500); 
+  });
+};
+const activeSocialName = ref('');
+let socialAnimationInterval = null;
+
+const triggerSocialWave = () => {
+  if (socials.value.length === 0) return;
+  
+  socials.value.forEach((social, index) => {
+    setTimeout(() => {
+      activeSocialName.value = social.name;
+      
+      setTimeout(() => {
+        if (activeSocialName.value === social.name) {
+          activeSocialName.value = '';
+        }
+      }, 1000);
+    }, index * 500);
+  });
+};
+
+
+
+
 const activeMainTab = ref('Portfolio'); // 'Portfolio' or 'Resume'
 const portfolioMode = ref('scroll'); // 'scroll', 'Works', 'Certificates', 'Stack'
 const selectedProject = ref(null);
@@ -1468,6 +1465,7 @@ const scrollProgress = ref(0);
 const pendingScrollSection = ref(null);
 const isLoading = ref(true);
 const isDark = ref(false);
+let revealObserver = null;
 const isResumeAuthorized = ref(false);
 const showResumeAccessModal = ref(false);
 const showRequestModal = ref(false);
@@ -1481,137 +1479,6 @@ const resumeAccessFeedback = reactive({
   type: '',
   message: '',
 });
-const isChatbotOpen = ref(false);
-const chatInput = ref('');
-const chatMessages = ref([
-  { 
-    role: 'bot', 
-    content: "Hi! I'm Joms' Assistant. I can help you find information about Joms' projects, skills, or contact details. How can I assist you today?",
-    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  }
-]);
-const botKnowledge = {
-    greetings: {
-        keywords: ['hello', 'hi', 'hey', 'kamusta', 'uy', 'asst'],
-        responses: ["Hi! I'm Joms' Assistant. I can help you find information about Joms' projects, skills, or contact details. How can I assist you today?", "Kamusta! Ako ang assistant ni Joms. Matutulungan kita malaman ang tungkol sa kanyang projects, skills, at contact details. Ano ang maipaglilingkod ko?"]
-    },
-    about: {
-        keywords: ['who', 'about', 'joms', 'sino', 'pangalan', 'profile'],
-        responses: ["Jho Mari 'Joms' Malaca is a BSIT Degree Holder from STI College Sta. Maria and an aspiring web developer specializing in Vue and Laravel.", "Si Jho Mari 'Joms' Malaca ay isang BSIT Degree Holder mula sa STI College Sta. Maria at isang aspiring web developer na mahusay sa Vue at Laravel."]
-    },
-    projects: {
-        keywords: ['project', 'work', 'gawa', 'showcase', 'apps'],
-        responses: ["Joms has built several projects: EduSync (Event Management), Mama Mary's Butcheron (POS), and this Portfolio v2.0. You can explore them in the 'Works' section of the Showcase!", "Ilan sa mga gawa ni Joms ay EduSync, Mama Mary's Butcheron (POS), at itong Portfolio v2.0. Makita mo lahat yan sa 'Works' section ng Showcase!"]
-    },
-    skills: {
-        keywords: ['skill', 'stack', 'tech', 'alam', 'marunong', 'expertise'],
-        responses: ["He is proficient in Vue.js, Laravel, Tailwind CSS, PHP, and MySQL. Check the 'Stack' section in Showcase for the full technical list.", "Ang kanyang tech stack ay Vue.js, Laravel, Tailwind CSS, PHP, at MySQL. Tingnan ang 'Stack' sa Showcase para sa buong listahan."]
-    },
-    resume: {
-        keywords: ['resume', 'cv', 'experience', 'education', 'background', 'aral', 'school'],
-        responses: ["You can view this in the Resume section. Just click the Resume tab at the top of the page!", "Makikita mo ang mga detalye na yan sa Resume section. I-click lang ang Resume tab sa itaas!"]
-    },
-    access: {
-        keywords: ['access', 'how', 'step', 'request', 'pano', 'paano', 'buksan', 'procedure'],
-        responses: ["To access the full resume: 1. Click 'Resume' tab 2. Click 'Request Access' 3. Enter Gmail & Purpose 4. Once approved, enter Gmail again to unlock!", "Para mabuksan ang resume: 1. I-click ang Resume tab 2. I-click ang 'Request Access' 3. Ilagay ang Gmail at dahilan 4. Pag approved na, i-type ulit ang Gmail para ma-unlock!"]
-    },
-    contact: {
-        keywords: ['contact', 'email', 'hire', 'message', 'tawag', 'txt', 'social'],
-        responses: ["You can reach Joms through the Contact section or directly at jhomarimalaca1@gmail.com. He is also on LinkedIn and GitHub!", "Maaari mong kausapin si Joms sa Contact section o mag-email sa jhomarimalaca1@gmail.com. Meron din siyang LinkedIn at GitHub!"]
-    },
-    compliments: {
-        keywords: ['handsome', 'pogi', 'gwapo', 'mabango', 'smell', 'intelligent', 'matalino', 'smart', 'talented', 'cool', 'best', 'pogi', 'mabait'],
-        responses: ["Yes, absolutely!", "Oo naman, totoo 'yan!"]
-    },
-    content: {
-        keywords: ['what can i see', 'laman', 'content', 'everything', 'features', 'list', 'info', 'ano ano', 'ano-ano'],
-        responses: ["In this portfolio, you can find Joms' web development projects, technical skills, verified certifications, and professional background. You can also request access to his full resume or send a direct message!", "Sa portfolio na ito, makikita mo ang mga web development projects ni Joms, kanyang technical skills, mga certifications, at personal background. Pwede ka ring mag-request ng access sa kanyang resume o mag-chat sa kanya!"]
-    }
-};
-
-const sendMessage = () => {
-    if (!chatInput.value.trim()) return;
-    
-    const userMessage = chatInput.value;
-    chatMessages.value.push({
-        role: 'user',
-        content: userMessage,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    });
-    
-    const query = userMessage.toLowerCase();
-    chatInput.value = '';
-    
-    setTimeout(() => {
-        let response = "";
-        const isTagalog = query.match(/kamusta|ano|sino|pano|paano|gawa|balita|uy|laman|anong|ano-ano/);
-        
-        // 1. Projects/Works logic
-        if (botKnowledge.projects.keywords.some(k => query.includes(k))) {
-            const projectNames = projects.value.map(p => p.title).join(', ');
-            response = isTagalog 
-                ? `Ang mga projects ni Joms ay: ${projectNames || 'wala pa sa ngayon'}. Makita mo lahat yan sa 'Works' section ng Showcase!`
-                : `Joms has built several projects: ${projectNames || 'none listed yet'}. You can explore them in the 'Works' section of the Showcase!`;
-        } 
-        // 2. Skills/Stack logic
-        else if (botKnowledge.skills.keywords.some(k => query.includes(k))) {
-            const stackNames = techStacks.value.map(s => s.name).join(', ');
-            response = isTagalog
-                ? `Ang mga tech stack ni Joms ay: ${stackNames || 'marami siyang alam na tech'}. Tingnan ang 'Stack' sa Showcase para sa buong listahan.`
-                : `Joms' technical stack includes: ${stackNames || 'various modern technologies'}. Check the 'Stack' section in Showcase for the full list.`;
-        }
-        // 3. Resume/Experience logic
-        else if (botKnowledge.resume.keywords.some(k => query.includes(k))) {
-            const school = resumeData.educationalBackground?.[0]?.school || 'STI College';
-            response = isTagalog
-                ? `Nag-aral si Joms sa ${school}. Para sa buong detalye ng experience at education, i-click lang ang 'Resume' tab sa itaas!`
-                : `Joms studied at ${school}. For full details on his experience and education, please check the 'Resume' tab at the top!`;
-        }
-        // 4. Access logic
-        else if (botKnowledge.access.keywords.some(k => query.includes(k))) {
-            response = isTagalog ? botKnowledge.access.responses[1] : botKnowledge.access.responses[0];
-        }
-        // 5. Contact/Social logic
-        else if (botKnowledge.contact.keywords.some(k => query.includes(k))) {
-            const gmail = settings.social.gmail || 'jhomarimalaca1@gmail.com';
-            response = isTagalog
-                ? `Maaari mong kausapin si Joms sa Contact section o mag-email sa ${gmail}. Meron din siyang LinkedIn at GitHub!`
-                : `You can reach Joms through the Contact section or directly at ${gmail}. He is also active on LinkedIn and GitHub!`;
-        }
-        // 6. About/Greetings
-        else if (botKnowledge.about.keywords.some(k => query.includes(k))) {
-            response = isTagalog ? botKnowledge.about.responses[1] : botKnowledge.about.responses[0];
-        }
-        else if (botKnowledge.greetings.keywords.some(k => query.includes(k))) {
-            response = isTagalog ? botKnowledge.greetings.responses[1] : botKnowledge.greetings.responses[0];
-        }
-        // 7. Compliments
-        else if (botKnowledge.compliments.keywords.some(k => query.includes(k))) {
-            response = isTagalog ? botKnowledge.compliments.responses[1] : botKnowledge.compliments.responses[0];
-        }
-        // 8. Content logic
-        else if (botKnowledge.content.keywords.some(k => query.includes(k))) {
-            response = isTagalog ? botKnowledge.content.responses[1] : botKnowledge.content.responses[0];
-        }
-        // Fallback
-        else {
-            response = isTagalog 
-                ? "Pasensya na, hindi ko sigurado ang sagot sa tanong mo. Maaari mong tingnan ang Showcase section o i-message si Joms sa Contact form!"
-                : "I'm not sure about that. You can check the 'Showcase' section for projects and skills, or message Joms directly via the 'Contact' form!";
-        }
-        
-        chatMessages.value.push({
-            role: 'bot',
-            content: response,
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        });
-        
-        nextTick(() => {
-            const container = document.getElementById('chat-messages-container');
-            if (container) container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
-        });
-    }, 600);
-};
 
 const requestStatusFeedback = reactive({
   type: '',
@@ -1832,6 +1699,13 @@ watch(activeMainTab, (newTab) => {
     portfolioMode.value = 'scroll';
     showResumeAccessModal.value = false;
     showRequestModal.value = false;
+    
+    // Refresh observer for scroll animations
+    nextTick(() => {
+      setTimeout(() => {
+        refreshRevealObserver();
+      }, 600);
+    });
     // Optionally scroll to top
     nextTick(() => {
       const container = document.getElementById('portfolio-scroll-container');
@@ -2090,9 +1964,11 @@ const triggerMessage = () => {
 };
 
 const contactViaGmail = () => {
-    const email = settings.social.gmail || 'jhomarimalaca1@gmail.com';
-    const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}`;
-    window.open(url, '_blank');
+    const email = settings.social.gmail;
+    if (email) {
+        const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}`;
+        window.open(url, '_blank');
+    }
 };
 
 // Watch for mode switches to handle pending scrolls
@@ -2112,7 +1988,50 @@ watch(portfolioMode, (newMode) => {
       }, 500); // Wait for the 'out' transition of the detailed view to finish
     });
   }
+
+  // Always re-initiate reveal observer when switching to scroll mode
+  if (newMode === 'scroll') {
+    nextTick(() => {
+      // Longer timeout to ensure the transition 'out' is done and 'in' has started
+      setTimeout(() => {
+        refreshRevealObserver();
+      }, 600);
+    });
+  }
 });
+
+const refreshRevealObserver = () => {
+  // Disconnect existing observer if any
+  if (revealObserver) {
+    revealObserver.disconnect();
+  }
+
+  const revealCallback = (entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('reveal-active');
+      } else {
+        entry.target.classList.remove('reveal-active');
+      }
+    });
+  };
+
+  // Re-create observer to ensure it's fresh for the new DOM elements
+  revealObserver = new IntersectionObserver(revealCallback, {
+    root: null, // Viewport
+    threshold: 0.05, // Lower threshold for more reliability
+    rootMargin: '0px 0px -50px 0px'
+  });
+
+  const revealElements = document.querySelectorAll('.reveal-on-scroll');
+  if (revealElements.length > 0) {
+    revealElements.forEach(el => {
+      // Reset state and observe
+      el.classList.remove('reveal-active');
+      revealObserver.observe(el);
+    });
+  }
+};
 
 const canvasRef = ref(null);
 let particles = [];
@@ -2170,6 +2089,12 @@ const animate = () => {
 onMounted(() => {
     window.addEventListener('resize', updateWidth);
     updateWidth();
+    loadData();
+    fetchWorks();
+    fetchCerts();
+    fetchStacks();
+    fetchAboutImages();
+    fetchSocialLinks();
     
     // Initialize Particles
     for (let i = 0; i < PARTICLE_COUNT; i++) {
@@ -2178,23 +2103,10 @@ onMounted(() => {
     
     if (isDark.value) animate();
 
-    // Load dynamic data from LocalStorage
-    const storedWorks = localStorage.getItem('portfolio_works');
-    if (storedWorks) projects.value = JSON.parse(storedWorks);
-
-    const storedCerts = localStorage.getItem('portfolio_certs');
-    if (storedCerts) certificates.value = JSON.parse(storedCerts);
-
-    const storedStacks = localStorage.getItem('portfolio_stacks');
-    if (storedStacks) techStacks.value = JSON.parse(storedStacks);
-
-    const storedFeaturedWorks = localStorage.getItem('portfolio_featured_works');
-    featuredWorkIds.value = storedFeaturedWorks ? JSON.parse(storedFeaturedWorks) : [];
-
-    const storedFeaturedCerts = localStorage.getItem('portfolio_featured_certs');
-    featuredCertIds.value = storedFeaturedCerts ? JSON.parse(storedFeaturedCerts) : [];
-
     // End Loading State
+    setTimeout(() => {
+      isLoading.value = false;
+    }, 2200);
 
     setTimeout(() => {
       isLoading.value = false;
@@ -2245,8 +2157,13 @@ onMounted(() => {
       }
     }, 4000); // 4 seconds for better viewing
 
-    // Load data from LocalStorage
-    loadData();
+    // Load data from Database
+    fetchWorks();
+    fetchCerts();
+    fetchStacks();
+    fetchAboutImages();
+    fetchSocialLinks();
+    fetchResume();
     
     // Start tech floating animation
     techInterval = setInterval(spawnFloatingTech, 3000);
@@ -2257,6 +2174,16 @@ onMounted(() => {
             startMatrixReveal();
         }
     }, 5000);
+
+    // Start stack wave animation
+    triggerStackWave(); // Initial trigger
+    stackAnimationInterval = setInterval(triggerStackWave, 10000); // Repeat every 10 seconds
+
+    // Start social wave animation
+    triggerSocialWave(); // Initial trigger
+    socialAnimationInterval = setInterval(triggerSocialWave, 10000); // Repeat every 10 seconds
+
+    refreshRevealObserver();
 });
 
 onUnmounted(() => {
@@ -2265,6 +2192,8 @@ onUnmounted(() => {
     if (galleryInterval) clearInterval(galleryInterval);
     if (techInterval) clearInterval(techInterval);
     if (matrixAutoInterval) clearInterval(matrixAutoInterval);
+    if (stackAnimationInterval) clearInterval(stackAnimationInterval);
+    if (socialAnimationInterval) clearInterval(socialAnimationInterval);
 });
 
 // Watch for dark mode changes to start/stop animation
@@ -2329,35 +2258,11 @@ const socials = computed(() => [
   }
 ]);
 
-const projects = ref([
-  {
-    title: 'EduSync',
-    description: 'A Centralized Event Management System for STI College Sta. Maria. Streamlining campus event coordination and attendee tracking.'
-  },
-  {
-    title: "Mama Mary's Butcheron",
-    description: 'Inventory management and POS system designed to streamline butcheron production and sales tracking.'
-  },
-  {
-    title: 'Portfolio v2.0',
-    description: 'A high-performance personal portfolio built with Vue 3 and Tailwind, featuring advanced animations and a premium dark aesthetic.'
-  }
-]);
+const projects = ref([]);
 
-const certificates = ref([
-  { title: 'Verified Certificate 1', issuer: 'STI College', description: 'Issued for excellence in software development.' },
-  { title: 'Verified Certificate 2', issuer: 'Industry Partner', description: 'Issued for excellence in software development.' },
-  { title: 'Verified Certificate 3', issuer: 'STI College', description: 'Issued for excellence in software development.' }
-]);
+const certificates = ref([]);
 
-const techStacks = ref([
-  { name: 'Vue.js', category: 'Frontend', image: 'https://img.icons8.com/color/144/vue-js.png' },
-  { name: 'Laravel', category: 'Backend', image: 'https://img.icons8.com/color/144/laravel.png' },
-  { name: 'Tailwind', category: 'Frontend', image: 'https://img.icons8.com/color/144/tailwindcss.png' },
-  { name: 'PHP', category: 'Backend', image: 'https://img.icons8.com/officel/160/php-logo.png' },
-  { name: 'MySQL', category: 'Backend', image: 'https://img.icons8.com/color/144/mysql-logo.png' },
-  { name: 'Git', category: 'Tools', image: 'https://img.icons8.com/color/144/git.png' }
-]);
+const techStacks = ref([]);
 
 const resumeData = reactive({
   basicInfo: { name: '', address: '', contact: '', email: '', profileImageLight: '', profileImageDark: '', resumePdf: '' },
@@ -2373,64 +2278,125 @@ const resumeData = reactive({
 const resumeViewMode = ref('normal'); // 'normal' or 'pdf'
 
 const loadData = () => {
-  const storedWorks = localStorage.getItem('portfolio_works');
-  const storedCerts = localStorage.getItem('portfolio_certs');
-  const storedStacks = localStorage.getItem('portfolio_stacks');
-  const storedFeaturedWorks = localStorage.getItem('portfolio_featured_works');
-  const storedFeaturedCerts = localStorage.getItem('portfolio_featured_certs');
-  const storedSettings = localStorage.getItem('portfolio_settings');
-  const storedResume = localStorage.getItem('portfolio_resume');
+  // Logic removed to ensure data is strictly database-driven.
+  // This prevents "old data" from appearing via localStorage.
+};
 
-  if (storedWorks) projects.value = JSON.parse(storedWorks);
-  if (storedCerts) certificates.value = JSON.parse(storedCerts);
-  if (storedStacks) techStacks.value = JSON.parse(storedStacks);
-  if (storedFeaturedWorks) featuredWorkIds.value = JSON.parse(storedFeaturedWorks);
-  if (storedFeaturedCerts) featuredCertIds.value = JSON.parse(storedFeaturedCerts);
-
-  if (storedResume) {
-    const parsed = JSON.parse(storedResume);
-    const currentBasic = { ...resumeData.basicInfo };
-    Object.assign(resumeData, parsed);
-    if (parsed.basicInfo) {
-      resumeData.basicInfo = { ...currentBasic, ...parsed.basicInfo };
+const fetchResume = async () => {
+  try {
+    const response = await axios.get('/resume');
+    if (response.data && response.data.basicInfo) {
+      const currentBasic = { ...resumeData.basicInfo };
+      Object.assign(resumeData, response.data);
+      resumeData.basicInfo = { ...currentBasic, ...response.data.basicInfo };
     }
-  }
-
-  if (storedSettings) {
-    const s = JSON.parse(storedSettings);
-    if (s.social) Object.assign(settings.social, s.social);
-    if (s.portfolio) {
-      if (!settings.portfolio) settings.portfolio = { aboutImages: [] };
-      settings.portfolio.aboutImages = s.portfolio.aboutImages || [];
-    }
+  } catch (error) {
+    console.error('Unable to load resume from database:', error);
   }
 };
 
-// Showcase: show admin-featured items, fallback to first 3 if none pinned
-const featuredProjects = computed(() => {
-  if (featuredWorkIds.value.length > 0) {
-    const pinned = featuredWorkIds.value
-      .map(id => projects.value.find(p => p.id === id))
-      .filter(Boolean);
-    if (pinned.length > 0) return pinned;
+const fetchWorks = async () => {
+  try {
+    const response = await axios.get('/works');
+    projects.value = response.data;
+    // Sync featuredWorkIds from database
+    featuredWorkIds.value = response.data
+      .filter(p => p.is_featured)
+      .map(p => p.id);
+  } catch (error) {
+    console.error('Unable to load works:', error);
   }
-  return projects.value.slice(0, 3);
+};
+
+const fetchCerts = async () => {
+  try {
+    const response = await axios.get('/certificates');
+    certificates.value = response.data;
+    // Sync featuredCertIds from database
+    featuredCertIds.value = response.data
+      .filter(c => c.is_featured)
+      .map(c => c.id);
+  } catch (error) {
+    console.error('Unable to load certificates:', error);
+  }
+};
+
+const fetchStacks = async () => {
+  try {
+    const response = await axios.get('/stacks');
+    techStacks.value = response.data;
+  } catch (error) {
+    console.error('Unable to load stacks:', error);
+  }
+};
+
+const fetchAboutImages = async () => {
+  try {
+    const response = await axios.get('/about-images');
+    if (!settings.portfolio) settings.portfolio = { aboutImages: [] };
+    settings.portfolio.aboutImages = response.data.map(img => ({
+      data: img.image,
+      id: img.id
+    }));
+  } catch (error) {
+    console.error('Unable to load about images:', error);
+  }
+};
+
+const fetchSocialLinks = async () => {
+  try {
+    const response = await axios.get('/social-links');
+    if (response.data && response.data.id) {
+      Object.assign(settings.social, response.data);
+    }
+  } catch (error) {
+    console.error('Unable to load social links:', error);
+  }
+};
+
+// Showcase: show ONLY admin-featured items, no fallback
+const featuredProjects = computed(() => {
+  if (featuredWorkIds.value.length === 0) return [];
+  return featuredWorkIds.value
+    .map(id => projects.value.find(p => p.id === id))
+    .filter(Boolean);
 });
 
 const featuredCertificates = computed(() => {
-  if (featuredCertIds.value.length > 0) {
-    const pinned = featuredCertIds.value
-      .map(id => certificates.value.find(c => c.id === id))
-      .filter(Boolean);
-    if (pinned.length > 0) return pinned;
-  }
-  return certificates.value.slice(0, 3);
+  if (featuredCertIds.value.length === 0) return [];
+  return featuredCertIds.value
+    .map(id => certificates.value.find(c => c.id === id))
+    .filter(Boolean);
+});
+
+const featuredStacks = computed(() => {
+  return techStacks.value.filter(s => s.is_featured);
 });
 
 
 </script>
 
 <style scoped>
+/* Scroll Reveal System */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+
+.reveal-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered Delay Utilities */
+.delay-100 { transition-delay: 100ms; }
+.delay-200 { transition-delay: 200ms; }
+.delay-300 { transition-delay: 300ms; }
+.delay-400 { transition-delay: 400ms; }
+.delay-500 { transition-delay: 500ms; }
+
 /* Sidebar Tabs Text Rotation */
 .vertical-text {
   writing-mode: vertical-rl;

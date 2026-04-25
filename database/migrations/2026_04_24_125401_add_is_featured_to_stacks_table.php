@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('stacks', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('category');
-            $table->text('image')->nullable();
-            $table->timestamps();
+        Schema::table('stacks', function (Blueprint $table) {
+            $table->boolean('is_featured')->default(false);
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('stacks');
+        Schema::table('stacks', function (Blueprint $table) {
+            $table->dropColumn('is_featured');
+        });
     }
 };
