@@ -48,7 +48,8 @@ class ResumeController extends Controller
             'trainings' => $resume->trainings ?? [],
             'personalInfo' => $resume->personal_info ?? (object)[],
             'references' => $resume->references ?? [],
-            'skills' => $resume->skills ?? []
+            'skills' => $resume->skills ?? [],
+            'downloads' => $resume->downloads ?? 0
         ]);
     }
 
@@ -79,5 +80,15 @@ class ResumeController extends Controller
         $resume->save();
 
         return response()->json(['message' => 'Resume saved successfully', 'resume' => $resume]);
+    }
+
+    public function incrementDownloads()
+    {
+        $resume = Resume::first();
+        if ($resume) {
+            $resume->increment('downloads');
+            return response()->json(['downloads' => $resume->downloads]);
+        }
+        return response()->json(['downloads' => 0]);
     }
 }

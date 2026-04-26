@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import MainPortfolio from './components/MainPortfolio.vue';
-import AdminDashboard from './components/AdminDashboard.vue';
-import AdminLogin from './components/AdminLogin.vue';
+
+// Lazy-load admin routes to keep the initial bundle small for visitors
+const AdminDashboard = () => import('./components/AdminDashboard.vue');
+const AdminLogin = () => import('./components/AdminLogin.vue');
 
 const routes = [
     {

@@ -229,8 +229,8 @@
                 </div>
               </div>
 
-              <!-- Resume Actions (Only in Resume View for Authorized Users) -->
-              <div v-if="activeMainTab === 'Resume' && isResumeAuthorized && resumeData.basicInfo.resumePdf" class="flex items-center gap-2">
+              <!-- Resume Actions (Only in Resume View) -->
+              <div v-if="activeMainTab === 'Resume' && resumeData.basicInfo.resumePdf" class="flex items-center gap-2">
                 <!-- Toggle View Button (Normal / PDF) -->
                 <button 
                   @click="resumeViewMode = resumeViewMode === 'normal' ? 'pdf' : 'normal'"
@@ -238,13 +238,14 @@
                 >
                   <svg v-if="resumeViewMode === 'normal'" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                   <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                  <span v-if="windowWidth > 640">{{ resumeViewMode === 'normal' ? 'View PDF' : 'Normal View' }}</span>
+                  <span v-if="windowWidth > 640">{{ resumeViewMode === 'normal' ? 'View Full Details' : 'View Summary' }}</span>
                 </button>
 
                 <!-- Download Resume Button -->
                 <a 
                   :href="resumeData.basicInfo.resumePdf" 
                   download="JhoMariMalacaResume" 
+                  @click="incrementResumeDownloads"
                   class="px-5 py-2.5 rounded-full bg-gradient-to-r from-cyan-500 to-indigo-600 text-white font-black text-[10px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-cyan-500/20 flex items-center gap-2 group"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 group-hover:bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
@@ -324,7 +325,7 @@
                         </span>
                       </h1>
                       <p :class="['text-base lg:text-lg mb-8 max-w-[400px] font-medium leading-relaxed transition-colors', isDark ? 'text-gray-400' : 'text-gray-500']">
-                        BSIT Degree Holder | Aspiring Developer <br/>
+                        BSIT Degree Holder | Full Stack Developer <br/>
                         Building strong foundations for long-term professional growth.
                       </p>
                       
@@ -357,9 +358,9 @@
 
                         <div :class="['w-64 h-64 lg:w-96 lg:h-96 rounded-full overflow-hidden relative z-10 flex items-center justify-center transition-all duration-700', isDark ? 'bg-black shadow-[0_40px_80px_-20px_rgba(6,182,212,0.5),0_30px_40px_-10px_rgba(79,70,229,0.4)]' : 'bg-white shadow-[0_35px_60px_-15px_rgba(0,0,0,0.3)]']">
                            <!-- Light Mode Video -->
-                           <video src="/images/vid1.mp4" :class="['absolute inset-0 w-full h-full object-contain transition-opacity duration-700', isDark ? 'opacity-0' : 'opacity-100']" autoplay muted loop playsinline disablePictureInPicture></video>
+                           <video src="/images/vid1.mp4" poster="/images/profile_art.png" :class="['absolute inset-0 w-full h-full object-contain transition-opacity duration-700', isDark ? 'opacity-0' : 'opacity-100']" autoplay muted loop playsinline disablePictureInPicture></video>
                            <!-- Dark Mode Video -->
-                           <video src="/images/vid2.mp4" :class="['absolute inset-0 w-full h-full object-contain transition-opacity duration-700', isDark ? 'opacity-100' : 'opacity-0']" autoplay muted loop playsinline disablePictureInPicture></video>
+                           <video src="/images/vid2.mp4" poster="/images/profile_art.png" :class="['absolute inset-0 w-full h-full object-contain transition-opacity duration-700', isDark ? 'opacity-100' : 'opacity-0']" autoplay muted loop playsinline disablePictureInPicture></video>
                         </div>
 
                         <transition-group name="fade-tech">
@@ -404,7 +405,7 @@
                           Jho Mari Malaca
                         </h2>
                         <p :class="['text-lg lg:text-l leading-relaxed mb-8 transition-colors max-w-xl', isDark ? 'text-gray-400' : 'text-gray-600']">
-                          I am studying Information Technology and specialize in Web Development, crafting modern and user-friendly websites with purpose and impact. <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500 font-bold">Let's create something great together.</span>
+                          IT graduate specializing in Web Development, continuously learning and improving while creating modern and user-friendly websites with purpose and impact. <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500 font-bold">Let's create something great together.</span>
                         </p>
 
                         <div class="flex items-center gap-6 mb-12">
@@ -440,7 +441,7 @@
                           <!-- Stack Summary -->
                           <div @click="portfolioMode = 'Stack'; activeNavItem = 'Showcase'" :class="['p-6 rounded-[24px] border transition-all duration-500 cursor-pointer group hover:-translate-y-2', isDark ? 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-cyan-500/30' : 'bg-white border-gray-200 shadow-md shadow-black/[0.06] hover:shadow-xl hover:border-cyan-300']">
                             <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center mb-4 group-hover:bg-cyan-500 group-hover:text-white transition-all">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
+                              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 lg:w-5 lg:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
                             </div>
                             <div :class="['text-2xl font-black mb-1 tracking-tighter', isDark ? 'text-white' : 'text-black']">{{ techStacks.length }}+</div>
                             <div :class="['text-[10px] font-bold uppercase tracking-widest', isDark ? 'text-gray-500' : 'text-gray-400']">Stack</div>
@@ -463,11 +464,11 @@
                                        v-show="idx === currentAboutImageIndex"
                                        :key="idx" 
                                        class="absolute inset-0 w-full h-full rounded-[inherit] overflow-hidden">
-                                     <img :src="img.data" alt="Profile About" class="w-full h-full object-cover -rotate-6 group-hover:rotate-0 transition-all duration-1000 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] scale-110 opacity-100" />
+                                     <img :src="img.data" alt="Profile About" class="w-full h-full object-cover -rotate-6 group-hover:rotate-0 transition-all duration-1000 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] scale-110 opacity-100" loading="lazy" />
                                   </div>
                                 </transition-group>
                              </div>
-                             <img v-else src="/images/profile_art.png" alt="Profile About" class="w-full h-full object-cover -rotate-6 group-hover:rotate-0 transition-all duration-1000 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] scale-110 opacity-100" />
+                             <img v-else src="/images/profile_art.png" alt="Profile About" class="w-full h-full object-cover -rotate-6 group-hover:rotate-0 transition-all duration-1000 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] scale-110 opacity-100" loading="lazy" />
                              
                              <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none rounded-[inherit]"></div>
                              
@@ -521,17 +522,17 @@
                               <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                               <div class="w-full aspect-video rounded-2xl bg-gradient-to-br from-cyan-500/10 to-indigo-600/10 mb-6 flex items-center justify-center overflow-hidden relative group/thumb">
                                 <!-- Hero Image fallback -->
-                                <img v-if="project.image && (!project.files || project.files.length === 0)" :src="project.image" alt="Project Thumbnail" class="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                                <img v-if="project.image && (!project.files || project.files.length === 0)" :src="project.image" alt="Project Thumbnail" class="w-full h-full object-cover transition-transform group-hover:scale-105" loading="lazy" />
                                 
                                 <!-- Showcase Gallery Loop -->
                                 <div v-else-if="project.files?.length > 0" ref="showcaseGalleries" class="w-full h-full flex overflow-x-auto scroll-hide snap-x">
                                   <!-- If hero image exists, put it first in the loop -->
                                   <div v-if="project.image" class="w-full h-full flex-shrink-0 snap-center">
-                                    <img :src="project.image" class="w-full h-full object-cover" />
+                                    <img :src="project.image" class="w-full h-full object-cover" loading="lazy" />
                                   </div>
                                   <!-- Then the gallery files -->
                                   <div v-for="(file, fIdx) in project.files" :key="fIdx" class="w-full h-full flex-shrink-0 snap-center bg-black/20">
-                                    <img v-if="file.type.startsWith('image/')" :src="file.data" class="w-full h-full object-cover" />
+                                    <img v-if="file.type.startsWith('image/')" :src="file.data" class="w-full h-full object-cover" loading="lazy" />
                                     <video v-else-if="file.type.startsWith('video/')" :src="file.data" class="w-full h-full object-cover" autoplay muted loop playsinline disablePictureInPicture controlsList="nopictureinpicture" disableRemotePlayback></video>
                                   </div>
                                 </div>
@@ -813,17 +814,17 @@
                               <div v-if="worksViewMode === 'list'" class="absolute top-0 left-0 h-full w-1 bg-gradient-to-b from-cyan-500 to-indigo-600 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
                               <div :class="['rounded-2xl bg-gradient-to-br from-cyan-500/10 to-indigo-600/10 flex items-center justify-center overflow-hidden relative group/thumb transition-all duration-500 shrink-0', worksViewMode === 'grid' ? 'w-full aspect-video mb-6' : 'w-full md:w-60 aspect-video md:mb-0']">
                                 <!-- Hero Image fallback -->
-                                <img v-if="project.image && (!project.files || project.files.length === 0)" :src="project.image" alt="Project Thumbnail" class="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                                <img v-if="project.image && (!project.files || project.files.length === 0)" :src="project.image" alt="Project Thumbnail" class="w-full h-full object-cover transition-transform group-hover:scale-105" loading="lazy" />
                                 
                                 <!-- Showcase Gallery Loop -->
                                 <div v-else-if="project.files?.length > 0" ref="portfolioGalleries" class="w-full h-full flex overflow-x-auto scroll-hide snap-x">
                                   <!-- If hero image exists, put it first in the loop -->
                                   <div v-if="project.image" class="w-full h-full flex-shrink-0 snap-center">
-                                    <img :src="project.image" class="w-full h-full object-cover" />
+                                    <img :src="project.image" class="w-full h-full object-cover" loading="lazy" />
                                   </div>
                                   <!-- Then the gallery files -->
                                   <div v-for="(file, fIdx) in project.files" :key="fIdx" class="w-full h-full flex-shrink-0 snap-center bg-black/20">
-                                    <img v-if="file.type.startsWith('image/')" :src="file.data" class="w-full h-full object-cover" />
+                                    <img v-if="file.type.startsWith('image/')" :src="file.data" class="w-full h-full object-cover" loading="lazy" />
                                     <video v-else-if="file.type.startsWith('video/')" :src="file.data" class="w-full h-full object-cover" autoplay muted loop playsinline disablePictureInPicture controlsList="nopictureinpicture" disableRemotePlayback></video>
                                   </div>
                                 </div>
@@ -938,18 +939,18 @@
             <main v-else-if="activeMainTab === 'Resume'" key="resume" class="absolute inset-0 p-6 lg:p-12 flex flex-col pt-12 lg:pt-0 overflow-hidden">
                 <!-- Normal HTML View -->
                 <div v-if="resumeViewMode === 'normal'" class="h-full flex flex-col overflow-hidden">
-                    <!-- Resume Content (Blurred if not authorized) -->
-                <div :class="['h-full overflow-y-auto scroll-hide pr-2 pb-12 flex flex-col gap-12 transition-all duration-700', !isResumeAuthorized ? 'blur-lg pointer-events-none scale-100 opacity-80' : '']">
+                    <!-- Resume Content -->
+                <div class="h-full overflow-y-auto scroll-hide pr-2 pb-12 flex flex-col gap-12 transition-all duration-700">
                     
                     <!-- Header / Basic Info -->
-                    <div class="flex flex-col-reverse md:flex-row justify-between items-center gap-10 border-b border-gray-200 dark:border-white/10 pb-12">
+                    <div class="flex flex-col-reverse md:flex-row justify-between items-center gap-10 border-b border-gray-400 dark:border-white/10 pb-12">
                        <!-- Text Content -->
                        <div class="flex-1 text-center md:text-left">
                            <h1 :class="['text-4xl lg:text-6xl font-black mb-4 tracking-tighter transition-colors', isDark ? 'text-white' : 'text-black']">{{ resumeData.basicInfo.name || 'Your Name' }}</h1>
                            <div :class="['flex flex-col justify-center md:justify-start gap-2.5 text-sm font-medium opacity-90', isDark ? 'text-gray-300' : 'text-gray-600']">
-                              <span class="flex items-center gap-2.5"><svg class="w-4 h-4 text-cyan-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> {{ resumeData.basicInfo.contact }}</span>
-                              <span class="flex items-center gap-2.5"><svg class="w-4 h-4 text-cyan-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg> {{ resumeData.basicInfo.email }}</span>
-                              <span class="flex items-center gap-2.5"><svg class="w-4 h-4 text-cyan-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> {{ resumeData.basicInfo.address }}</span>
+                              <span v-if="resumeData.basicInfo.contact" class="flex items-center gap-2.5"><svg class="w-4 h-4 text-cyan-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> {{ resumeData.basicInfo.contact }}</span>
+                              <span v-if="resumeData.basicInfo.email" class="flex items-center gap-2.5"><svg class="w-4 h-4 text-cyan-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg> {{ resumeData.basicInfo.email }}</span>
+                              <span v-if="resumeData.basicInfo.address" class="flex items-center gap-2.5"><svg class="w-4 h-4 text-cyan-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> {{ resumeData.basicInfo.address }}</span>
                            </div>
                        </div>
 
@@ -1038,7 +1039,7 @@
                                 <h2 class="text-xs font-black uppercase tracking-[0.3em] text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-600 mb-6">Personal details</h2>
                                 <div :class="['p-6 rounded-3xl border transition-colors', isDark ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200']">
                                    <div class="space-y-4">
-                                      <div v-for="(val, key) in resumeData.personalInfo" :key="key" v-show="val" class="flex justify-between items-center border-b border-gray-200 dark:border-white/5 pb-3 last:border-0 last:pb-0">
+                                      <div v-for="(val, key) in resumeData.personalInfo" :key="key" v-show="val" class="flex justify-between items-center border-b border-gray-300 dark:border-white/5 pb-3 last:border-0 last:pb-0">
                                          <span class="text-[10px] font-black uppercase tracking-widest text-gray-500">{{ key.replace(/([A-Z])/g, ' $1').trim() }}</span>
                                          <span class="text-sm font-bold capitalize text-right" :class="isDark ? 'text-white' : 'text-black'">{{ val }}</span>
                                       </div>
@@ -1068,178 +1069,12 @@
 
                  <!-- PDF Viewer Mode -->
                  <div v-if="resumeViewMode === 'pdf'" class="h-full flex flex-col overflow-hidden animate-fade-in relative">
-                    <div :class="['h-full w-full rounded-[40px] overflow-hidden border shadow-2xl transition-all duration-700 pb-12', isDark ? 'bg-black/40 border-white/5 shadow-white/5' : 'bg-gray-50 border-gray-100', !isResumeAuthorized ? 'blur-lg pointer-events-none' : '']">
+                    <div :class="['h-full w-full rounded-[40px] overflow-hidden border shadow-2xl transition-all duration-700 pb-12', isDark ? 'bg-black/40 border-white/5 shadow-white/5' : 'bg-gray-50 border-gray-100']">
                        <iframe v-if="resumeData.basicInfo.resumePdf" :src="resumeData.basicInfo.resumePdf" class="w-full h-full border-0 rounded-[30px]" title="Resume PDF View"></iframe>
                     </div>
                  </div>
 
-                <!-- Private Overlay -->
-                <div v-if="!isResumeAuthorized" class="absolute inset-0 z-[10] flex items-center justify-center p-6 bg-transparent">
-                  <div class="flex flex-col items-center text-center space-y-8 animate-fade-in group">
-                     <!-- Animated Lock Icon -->
-                     <button @click="requestResumeAccess" class="relative group active:scale-95 transition-all">
-                        <div class="absolute inset-0 bg-gradient-to-r from-cyan-500 to-indigo-600 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
-                        <div :class="['w-24 h-24 rounded-full border flex items-center justify-center shadow-2xl relative z-10 transition-all duration-500', isDark ? 'bg-[#151515] border-white/10 group-hover:border-white/30' : 'bg-white border-gray-200 group-hover:border-cyan-200']">
-                           <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 transition-all duration-500 group-hover:scale-110" :class="isDark ? 'text-cyan-400' : 'text-cyan-600'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        </div>
-                     </button>
-                     
-                     <div class="space-y-3 max-w-sm">
-                        <h3 :class="['text-2xl font-black tracking-tight', isDark ? 'text-white' : 'text-black']">Private Access Required</h3>
-                        <p :class="['text-sm font-medium leading-relaxed opacity-60', isDark ? 'text-gray-300' : 'text-gray-600']">This section contains sensitive professional information. Enter an approved email to unlock the resume or submit an access request.</p>
-                      </div>
 
-                     <button 
-                        @click="requestResumeAccess"
-                        class="px-10 py-5 rounded-2xl bg-gradient-to-r from-cyan-500 to-indigo-600 text-white font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-cyan-500/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
-                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-                        Request Resume
-                     </button>
-                  </div>
-                </div>
-
-                <!-- Resume Access Card -->
-                <transition name="modal-fade">
-                  <div v-if="showResumeAccessModal" class="absolute inset-0 z-[110] flex items-center justify-center p-4">
-                     <div @click="showResumeAccessModal = false" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-
-                     <div :class="['relative w-full max-w-sm p-8 rounded-[32px] border shadow-2xl transition-all duration-500 animate-slide-up', isDark ? 'bg-[#151515] border-white/5' : 'bg-white border-gray-100']">
-                        <div class="flex items-center justify-between mb-6">
-                           <div>
-                             <p class="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-500 mb-2">Resume Access</p>
-                             <h4 :class="['text-lg font-black tracking-tight', isDark ? 'text-white' : 'text-black']">Enter Your Approved Email</h4>
-                           </div>
-                           <button @click="showResumeAccessModal = false" :class="['w-8 h-8 rounded-full flex items-center justify-center transition-all', isDark ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-100 text-gray-500']">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                           </button>
-                        </div>
-
-                        <div class="space-y-4">
-                           <p :class="['text-sm leading-relaxed', isDark ? 'text-gray-300' : 'text-gray-600']"> Only emails approved by the owner are allowed to open and view the resume without any restrictions.</p>
-
-                           <div class="space-y-2">
-                             <label class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Email Address</label>
-                             <input
-                               v-model="resumeAccessForm.email"
-                               type="email"
-                               placeholder="Enter your email"
-                               :class="['w-full px-5 py-3.5 rounded-2xl border text-sm font-medium transition-all outline-none', isDark ? 'bg-white/5 border-white/5 focus:border-cyan-500/50 text-white placeholder:text-white/20' : 'bg-gray-50 border-gray-200 focus:border-cyan-500/50 text-black placeholder:text-gray-400']"
-                             />
-                           </div>
-
-                           <div v-if="resumeAccessFeedback.message" :class="[
-                             'rounded-2xl border px-4 py-3 text-sm leading-relaxed',
-                             resumeAccessFeedback.type === 'success'
-                               ? (isDark ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-300' : 'border-emerald-200 bg-emerald-50 text-emerald-700')
-                               : resumeAccessFeedback.type === 'warning'
-                                 ? (isDark ? 'border-amber-500/20 bg-amber-500/10 text-amber-300' : 'border-amber-200 bg-amber-50 text-amber-700')
-                                 : (isDark ? 'border-red-500/20 bg-red-500/10 text-red-300' : 'border-red-200 bg-red-50 text-red-700')
-                           ]">
-                             {{ resumeAccessFeedback.message }}
-                           </div>
-
-                           <button
-                             @click="verifyResumeAccess"
-                             :disabled="isCheckingResumeAccess"
-                              :class="[
-                                'w-full py-4 rounded-2xl text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-cyan-500/20 transition-all',
-                                isCheckingResumeAccess
-                                  ? (isDark ? 'bg-white/10 text-white cursor-not-allowed opacity-70' : 'bg-gray-100 text-gray-500 border border-gray-200 shadow-none cursor-not-allowed')
-                                  : 'bg-gradient-to-br from-cyan-400 to-indigo-600 hover:scale-[1.02] active:scale-[0.98]'
-                              ]"
-                            >
-                             {{ isCheckingResumeAccess ? 'Checking...' : 'Continue To Resume' }}
-                           </button>
-
-                           <button
-                             @click="requestResumeAccess"
-                             type="button"
-                             :class="['w-full py-3 rounded-2xl border text-[10px] font-black uppercase tracking-widest transition-all', isDark ? 'border-white/10 text-gray-300 hover:bg-white/5' : 'border-gray-200 text-gray-600 hover:bg-gray-50']"
-                           >
-                             Request Access Instead
-                           </button>
-                        </div>
-                     </div>
-                  </div>
-                </transition>
-
-                <!-- Floating Request Form Card -->
-                <transition name="modal-fade">
-                  <div v-if="showRequestModal" class="absolute inset-0 z-[100] flex items-center justify-center p-4">
-                     <!-- Local Backdrop -->
-                     <div @click="showRequestModal = false" class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
-                     
-                     <!-- Small Floating Card -->
-                     <div :class="['relative w-full max-w-sm p-8 rounded-[32px] border shadow-2xl transition-all duration-500 animate-slide-up', isDark ? 'bg-[#151515] border-white/5' : 'bg-white border-gray-100']">
-                        <div class="flex items-center justify-between mb-6">
-                           <h4 :class="['text-lg font-black tracking-tight', isDark ? 'text-white' : 'text-black']">Request View</h4>
-                           <button @click="showRequestModal = false" :class="['w-8 h-8 rounded-full flex items-center justify-center transition-all', isDark ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-100 text-gray-500']">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                           </button>
-                        </div>
-
-                        <div class="space-y-4">
-                            <div class="space-y-2">
-                              <label class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Your Gmail</label>
-                              <input 
-                                v-model="requestForm.email"
-                                @blur="checkRequestEmailStatus"
-                                type="email" 
-                                placeholder="Enter your Gmail address"
-                                :class="['w-full px-5 py-3.5 rounded-2xl border text-sm font-medium transition-all outline-none', isDark ? 'bg-white/5 border-white/5 focus:border-cyan-500/50 text-white placeholder:text-white/20' : 'bg-gray-50 border-gray-200 focus:border-cyan-500/50 text-black placeholder:text-gray-400']"
-                              />
-                            </div>
-                            <div v-if="requestStatusFeedback.message" :class="[
-                              'rounded-2xl border px-4 py-3 text-sm leading-relaxed',
-                              requestStatusFeedback.type === 'success'
-                                ? (isDark ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-300' : 'border-emerald-200 bg-emerald-50 text-emerald-700')
-                                : requestStatusFeedback.type === 'warning'
-                                  ? (isDark ? 'border-amber-500/20 bg-amber-500/10 text-amber-300' : 'border-amber-200 bg-amber-50 text-amber-700')
-                                  : (isDark ? 'border-red-500/20 bg-red-500/10 text-red-300' : 'border-red-200 bg-red-50 text-red-700')
-                            ]">
-                              {{ requestStatusFeedback.message }}
-                            </div>
-                            <div class="space-y-2">
-                              <label class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Purpose</label>
-                              <textarea 
-                                v-model="requestForm.purpose"
-                                rows="3"
-                                placeholder="Why do you need access?"
-                                :class="['w-full px-5 py-3.5 rounded-2xl border text-sm font-medium transition-all outline-none resize-none', isDark ? 'bg-white/5 border-white/5 focus:border-cyan-500/50 text-white placeholder:text-white/20' : 'bg-gray-50 border-gray-200 focus:border-cyan-500/50 text-black placeholder:text-gray-400']"
-                              ></textarea>
-                           </div>
-                           
-                            <button 
-                              @click="submitResumeRequest"
-                              :disabled="isSubmittingResumeRequest || isCheckingRequestEmail || requestStatusFeedback.status === 'accepted'"
-                              :class="[
-                                'w-full py-4 mt-2 rounded-2xl font-black text-xs uppercase tracking-widest transition-all',
-                                isSubmittingResumeRequest || isCheckingRequestEmail || requestStatusFeedback.status === 'accepted'
-                                  ? (requestStatusFeedback.status === 'accepted'
-                                      ? (isDark ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/20 shadow-none cursor-not-allowed' : 'bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-none cursor-not-allowed')
-                                      : (isDark ? 'bg-white/10 text-white cursor-not-allowed opacity-70 shadow-none' : 'bg-gray-100 text-gray-400 border border-gray-200 shadow-none cursor-not-allowed'))
-                                  : 'bg-gradient-to-br from-cyan-400 to-indigo-600 text-white shadow-xl shadow-cyan-500/20 hover:scale-[1.02] active:scale-[0.98]'
-                              ]"
-                            >
-                              {{ isSubmittingResumeRequest ? 'Sending...' : isCheckingRequestEmail ? 'Checking...' : requestStatusFeedback.status === 'accepted' ? 'Already Approved' : 'Send Request' }}
-                            </button>
-
-                            <button
-                              @click="goToResumeAccess"
-                              type="button"
-                              :class="['w-full py-3 rounded-2xl border text-[10px] font-black uppercase tracking-widest transition-all', isDark ? 'border-white/10 text-gray-300 hover:bg-white/5' : 'border-gray-200 text-gray-600 hover:bg-gray-50']"
-                           >
-                              Go To Resume Access
-                            </button>
-
-                            <p :class="['text-[12px] leading-relaxed font-bold opacity-40 text-center px-4', isDark ? 'text-white' : 'text-black']">
-                               We ensure that all incoming requests are acknowledged and processed within 24 hours.
-                            </p>
-                         </div>
-                     </div>
-                  </div>
-                </transition>
             </main>
           </transition>
         </div>
@@ -1310,11 +1145,11 @@
                 <div class="relative aspect-video rounded-3xl overflow-hidden bg-black/40 border border-white/5 group/modal-gal shadow-2xl">
                    <div ref="modalGallery" class="w-full h-full flex overflow-x-auto scroll-hide snap-x">
                       <div v-if="selectedProject.image" class="w-full h-full flex-shrink-0 snap-center">
-                        <img :src="selectedProject.image" class="w-full h-full object-cover" />
+                        <img :src="selectedProject.image" class="w-full h-full object-cover" loading="lazy" />
                       </div>
                       <div v-for="(file, fIdx) in (selectedProject.files || [])" :key="fIdx" class="w-full h-full flex-shrink-0 snap-center">
-                        <img v-if="file.type.startsWith('image/')" :src="file.data" class="w-full h-full object-cover" />
-                        <video v-else-if="file.type.startsWith('video/')" :src="file.data" class="w-full h-full object-cover" autoplay muted loop playsinline disablePictureInPicture></video>
+                        <img v-if="file.type.startsWith('image/')" :src="file.data" class="w-full h-full object-cover" loading="lazy" />
+                        <video v-else-if="file.type.startsWith('video/')" :src="file.data" :poster="file.poster" class="w-full h-full object-cover" autoplay muted loop playsinline disablePictureInPicture></video>
                       </div>
                    </div>
                    <!-- Nav Indicator -->
@@ -1466,29 +1301,7 @@ const pendingScrollSection = ref(null);
 const isLoading = ref(true);
 const isDark = ref(false);
 let revealObserver = null;
-const isResumeAuthorized = ref(false);
-const showResumeAccessModal = ref(false);
-const showRequestModal = ref(false);
-const isCheckingResumeAccess = ref(false);
-const isSubmittingResumeRequest = ref(false);
-const isCheckingRequestEmail = ref(false);
-const resumeAccessForm = reactive({
-  email: '',
-});
-const resumeAccessFeedback = reactive({
-  type: '',
-  message: '',
-});
 
-const requestStatusFeedback = reactive({
-  type: '',
-  message: '',
-  status: '',
-});
-const requestForm = reactive({
-  email: '',
-  purpose: ''
-});
 
 const notification = reactive({
   show: false,
@@ -1505,200 +1318,14 @@ const showNotification = (message, type = 'success') => {
   }, 4000);
 };
 
-const normalizeAccessEmail = (email) => email.trim().toLowerCase();
-
-const setRequestStatusFeedback = (status) => {
-  requestStatusFeedback.status = status;
-
-  if (status === 'accepted') {
-    requestStatusFeedback.type = 'success';
-    requestStatusFeedback.message = 'This email is already accepted. You can go directly to Resume Access.';
-    return;
-  }
-
-  if (status === 'pending') {
-    requestStatusFeedback.type = 'warning';
-    requestStatusFeedback.message = 'This email already has a pending request. Sending again will refresh its submission date.';
-    return;
-  }
-
-  if (status === 'declined') {
-    requestStatusFeedback.type = 'warning';
-    requestStatusFeedback.message = 'This email was previously declined. Sending again will refresh the request for another review.';
-    return;
-  }
-
-  requestStatusFeedback.type = '';
-  requestStatusFeedback.message = '';
-};
-
 const openResumeSection = () => {
   activeMainTab.value = 'Resume';
-  isResumeAuthorized.value = false;
-  showResumeAccessModal.value = true;
-  showRequestModal.value = false;
-  resumeAccessForm.email = '';
-  requestForm.email = '';
-  requestForm.purpose = '';
-  resumeAccessFeedback.type = '';
-  resumeAccessFeedback.message = '';
-  setRequestStatusFeedback('');
-};
-
-const requestResumeAccess = () => {
-  resumeAccessForm.email = '';
-  requestForm.email = '';
-  requestForm.purpose = '';
-  setRequestStatusFeedback('');
-  showResumeAccessModal.value = false;
-  showRequestModal.value = true;
-};
-
-const goToResumeAccess = () => {
-  resumeAccessForm.email = '';
-  requestForm.email = '';
-  requestForm.purpose = '';
-  setRequestStatusFeedback('');
-  resumeAccessFeedback.type = '';
-  resumeAccessFeedback.message = '';
-  showRequestModal.value = false;
-  showResumeAccessModal.value = true;
-};
-
-const checkRequestEmailStatus = async () => {
-  if (!requestForm.email) {
-    setRequestStatusFeedback('');
-    return;
-  }
-
-  const normalizedEmail = normalizeAccessEmail(requestForm.email);
-  requestForm.email = normalizedEmail;
-  resumeAccessForm.email = normalizedEmail;
-  isCheckingRequestEmail.value = true;
-
-  try {
-    const response = await axios.post('/resume-requests/check-access', {
-      email: normalizedEmail,
-    });
-
-    setRequestStatusFeedback(response.data?.status || '');
-  } catch (error) {
-    console.error('Request email status check failed:', error);
-    requestStatusFeedback.status = '';
-    requestStatusFeedback.type = 'error';
-    requestStatusFeedback.message = 'Unable to check this email right now. You can still try sending a request.';
-  } finally {
-    isCheckingRequestEmail.value = false;
-  }
-};
-
-const verifyResumeAccess = async () => {
-  if (!resumeAccessForm.email) {
-    resumeAccessFeedback.type = 'error';
-    resumeAccessFeedback.message = 'Please enter your email to continue.';
-    isResumeAuthorized.value = false;
-    return;
-  }
-
-  const normalizedEmail = normalizeAccessEmail(resumeAccessForm.email);
-  resumeAccessForm.email = normalizedEmail;
-  isCheckingResumeAccess.value = true;
-  resumeAccessFeedback.type = '';
-  resumeAccessFeedback.message = '';
-
-  try {
-    const response = await axios.post('/resume-requests/check-access', {
-      email: normalizedEmail,
-    });
-
-    requestForm.email = normalizedEmail;
-
-    if (response.data?.authorized) {
-      isResumeAuthorized.value = true;
-      localStorage.setItem('portfolio_resume_access_email', normalizedEmail);
-      resumeAccessFeedback.type = 'success';
-      resumeAccessFeedback.message = 'Access approved. Your resume is now available.';
-
-      setTimeout(() => {
-        showResumeAccessModal.value = false;
-      }, 300);
-
-      return;
-    }
-
-    isResumeAuthorized.value = false;
-
-    if (response.data?.status === 'pending') {
-      resumeAccessFeedback.type = 'warning';
-      resumeAccessFeedback.message = 'Your request is still pending admin approval. The resume will stay blurred until it is accepted.';
-    } else if (response.data?.status === 'declined') {
-      resumeAccessFeedback.type = 'error';
-      resumeAccessFeedback.message = 'This email has not been approved for resume access. You can submit a new request below.';
-    } else {
-      resumeAccessFeedback.type = 'warning';
-      resumeAccessFeedback.message = 'No approved request was found for this email yet. You can request access below.';
-    }
-  } catch (error) {
-    console.error('Resume access verification failed:', error);
-    isResumeAuthorized.value = false;
-    resumeAccessFeedback.type = 'error';
-    resumeAccessFeedback.message = 'Unable to verify resume access right now. Please try again.';
-  } finally {
-    isCheckingResumeAccess.value = false;
-  }
-};
-
-const submitResumeRequest = async () => {
-  if (!requestForm.email || !requestForm.purpose) {
-    showNotification('Please provide your Gmail and purpose.', 'warning');
-    return;
-  }
-
-  const normalizedEmail = normalizeAccessEmail(requestForm.email);
-  requestForm.email = normalizedEmail;
-  resumeAccessForm.email = normalizedEmail;
-  isSubmittingResumeRequest.value = true;
-
-  try {
-    const response = await axios.post('/resume-requests', {
-      email: normalizedEmail,
-      purpose: requestForm.purpose,
-    });
-
-    const action = response.data?.action;
-    const message = response.data?.message;
-
-    if (action === 'accepted') {
-      requestStatusFeedback.status = 'accepted';
-      requestStatusFeedback.type = 'success';
-      requestStatusFeedback.message = message || 'This email is already approved for resume access.';
-      return;
-    }
-
-    showNotification(message || 'Your resume request has been sent successfully.', 'success');
-    setRequestStatusFeedback('pending');
-    showRequestModal.value = false;
-    showResumeAccessModal.value = true;
-    resumeAccessFeedback.type = 'warning';
-    resumeAccessFeedback.message = action === 'updated'
-      ? 'Your existing request was refreshed. The resume will remain blurred until your email is approved.'
-      : 'Your request was submitted. The resume will remain blurred until your email is approved.';
-    localStorage.setItem('portfolio_resume_access_email', normalizedEmail);
-    requestForm.purpose = '';
-  } catch (error) {
-    console.error('Resume request submission failed:', error);
-    showNotification('Unable to send your request right now. Please try again.', 'error');
-  } finally {
-    isSubmittingResumeRequest.value = false;
-  }
 };
 
 watch(activeMainTab, (newTab) => {
   if (newTab === 'Portfolio') {
     activeNavItem.value = 'Home';
     portfolioMode.value = 'scroll';
-    showResumeAccessModal.value = false;
-    showRequestModal.value = false;
     
     // Refresh observer for scroll animations
     nextTick(() => {
@@ -1898,32 +1525,42 @@ const updateWidth = () => {
     windowWidth.value = window.innerWidth;
 };
 
+let scrollTicking = false;
+
 const handleScroll = (event) => {
   if (activeMainTab.value !== 'Portfolio') return;
   
   const container = event.target;
   
-  // Update scroll progress percentage
-  const scrolled = container.scrollTop;
-  const maxScroll = container.scrollHeight - container.clientHeight;
-  if (maxScroll > 0) {
-    scrollProgress.value = (scrolled / maxScroll) * 100;
-  }
-
-  const sections = ['Home', 'About', 'Showcase', 'Contact'];
-  
-  for (const id of sections) {
-    const section = document.getElementById(id);
-    if (section) {
-      const rect = section.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-      
-      // If the section is near the top of the container, set it as active
-      if (rect.top >= containerRect.top - 150 && rect.top <= containerRect.top + 250) {
-        activeNavItem.value = id;
-        break;
+  if (!scrollTicking) {
+    window.requestAnimationFrame(() => {
+      // Update scroll progress percentage
+      const scrolled = container.scrollTop;
+      const maxScroll = container.scrollHeight - container.clientHeight;
+      if (maxScroll > 0) {
+        scrollProgress.value = (scrolled / maxScroll) * 100;
       }
-    }
+
+      const sections = ['Home', 'About', 'Showcase', 'Contact'];
+      
+      for (const id of sections) {
+        const section = document.getElementById(id);
+        if (section) {
+          const rect = section.getBoundingClientRect();
+          const containerRect = container.getBoundingClientRect();
+          
+          // If the section is near the top of the container, set it as active
+          if (rect.top >= containerRect.top - 150 && rect.top <= containerRect.top + 250) {
+            if (activeNavItem.value !== id) {
+              activeNavItem.value = id;
+            }
+            break;
+          }
+        }
+      }
+      scrollTicking = false;
+    });
+    scrollTicking = true;
   }
 };
 
@@ -2035,7 +1672,7 @@ const refreshRevealObserver = () => {
 
 const canvasRef = ref(null);
 let particles = [];
-const PARTICLE_COUNT = 100;
+const PARTICLE_COUNT = typeof window !== 'undefined' && window.innerWidth < 768 ? 40 : 80;
 let animationFrameId = null;
 
 class Particle {
@@ -2073,8 +1710,11 @@ const animate = () => {
     
     for (let j = i + 1; j < particles.length; j++) {
       const p2 = particles[j];
-      const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-      if (dist < 150) {
+      const dx = p.x - p2.x;
+      const dy = p.y - p2.y;
+      const distSq = dx * dx + dy * dy;
+      if (distSq < 22500) { // 150 * 150
+        const dist = Math.sqrt(distSq);
         ctx.lineWidth = (1 - dist / 150) * 1.5;
         ctx.beginPath();
         ctx.moveTo(p.x, p.y);
@@ -2086,15 +1726,9 @@ const animate = () => {
   animationFrameId = requestAnimationFrame(animate);
 };
 
-onMounted(() => {
+onMounted(async () => {
     window.addEventListener('resize', updateWidth);
     updateWidth();
-    loadData();
-    fetchWorks();
-    fetchCerts();
-    fetchStacks();
-    fetchAboutImages();
-    fetchSocialLinks();
     
     // Initialize Particles
     for (let i = 0; i < PARTICLE_COUNT; i++) {
@@ -2103,14 +1737,25 @@ onMounted(() => {
     
     if (isDark.value) animate();
 
-    // End Loading State
-    setTimeout(() => {
-      isLoading.value = false;
-    }, 2200);
+    // Load all data in parallel and hide loader when done
+    // Minimum 0ms splash for visual polish, max 5s safety timeout
+    const minSplash = new Promise(resolve => setTimeout(resolve, 0));
+    const dataLoaded = Promise.all([
+      fetchWorks(),
+      fetchCerts(),
+      fetchStacks(),
+      fetchAboutImages(),
+      fetchSocialLinks(),
+      fetchResume()
+    ]);
+    const safetyTimeout = new Promise(resolve => setTimeout(resolve, 5000));
 
-    setTimeout(() => {
-      isLoading.value = false;
-    }, 2200);
+    // Wait for both: minimum splash time AND data to load (or safety timeout)
+    await Promise.all([
+      minSplash,
+      Promise.race([dataLoaded, safetyTimeout])
+    ]);
+    isLoading.value = false;
 
     // Auto-scroll loop for project galleries
     galleryInterval = setInterval(() => {
@@ -2156,14 +1801,6 @@ onMounted(() => {
         currentAboutImageIndex.value = (currentAboutImageIndex.value + 1) % settings.portfolio.aboutImages.length;
       }
     }, 4000); // 4 seconds for better viewing
-
-    // Load data from Database
-    fetchWorks();
-    fetchCerts();
-    fetchStacks();
-    fetchAboutImages();
-    fetchSocialLinks();
-    fetchResume();
     
     // Start tech floating animation
     techInterval = setInterval(spawnFloatingTech, 3000);
@@ -2275,20 +1912,42 @@ const resumeData = reactive({
   references: []
 });
 
+const resumeDownloads = ref(0);
+
 const resumeViewMode = ref('normal'); // 'normal' or 'pdf'
 
-const loadData = () => {
-  // Logic removed to ensure data is strictly database-driven.
-  // This prevents "old data" from appearing via localStorage.
+const incrementResumeDownloads = async () => {
+  // Check if this device has already downloaded the resume
+  if (localStorage.getItem('resumeDownloaded')) {
+    return; // Skip API call, but PDF will still download
+  }
+
+  try {
+    const response = await axios.post('/resume/increment-downloads');
+    if (response.data && response.data.downloads !== undefined) {
+      resumeDownloads.value = response.data.downloads;
+    } else {
+      resumeDownloads.value++;
+    }
+    // Set flag in local storage to prevent future increments from this device
+    localStorage.setItem('resumeDownloaded', 'true');
+  } catch (error) {
+    console.error('Failed to increment resume downloads:', error);
+  }
 };
 
 const fetchResume = async () => {
   try {
     const response = await axios.get('/resume');
-    if (response.data && response.data.basicInfo) {
-      const currentBasic = { ...resumeData.basicInfo };
-      Object.assign(resumeData, response.data);
-      resumeData.basicInfo = { ...currentBasic, ...response.data.basicInfo };
+    if (response.data) {
+      if (response.data.downloads !== undefined) {
+        resumeDownloads.value = response.data.downloads;
+      }
+      if (response.data.basicInfo) {
+        const currentBasic = { ...resumeData.basicInfo };
+        Object.assign(resumeData, response.data);
+        resumeData.basicInfo = { ...currentBasic, ...response.data.basicInfo };
+      }
     }
   } catch (error) {
     console.error('Unable to load resume from database:', error);

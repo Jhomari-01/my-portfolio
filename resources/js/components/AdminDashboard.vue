@@ -1,8 +1,20 @@
 <template>
   <div class="flex h-screen bg-[#050505] text-white font-sans overflow-hidden">
     
+    <!-- Mobile Sidebar Overlay -->
+    <div 
+      v-if="isSidebarOpen" 
+      @click="isSidebarOpen = false" 
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] lg:hidden animate-fade-in"
+    ></div>
+
     <!-- Sidebar -->
-    <aside class="w-72 bg-[#0a0a0a] border-r border-white/5 flex flex-col pt-8 pb-6 relative z-10 transition-all flex-shrink-0">
+    <aside 
+      :class="[
+        'fixed inset-y-0 left-0 w-72 bg-[#0a0a0a] border-r border-white/5 flex flex-col pt-8 pb-6 z-[100] transition-all duration-300 lg:relative lg:translate-x-0',
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      ]"
+    >
       <!-- Ambient Glow -->
       <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-cyan-500/5 via-transparent to-indigo-500/5 pointer-events-none"></div>
       
@@ -16,7 +28,7 @@
         <button 
           v-for="menu in menus" 
           :key="menu.id"
-          @click="activeTab = menu.id"
+          @click="activeTab = menu.id; isSidebarOpen = false"
           :class="[
             'w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl text-sm font-bold transition-all duration-300 relative group overflow-hidden',
             activeTab === menu.id 
@@ -35,7 +47,7 @@
             <svg v-else-if="menu.icon === 'certs'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
             <svg v-else-if="menu.icon === 'stacks'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
             <svg v-else-if="menu.icon === 'resume'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
-            <svg v-else-if="menu.icon === 'requests'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+
             <svg v-else-if="menu.icon === 'settings'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           </div>
           
@@ -64,19 +76,32 @@
       <div class="max-w-6xl mx-auto space-y-10 pb-20">
         
         <!-- Header Actions -->
-        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/5 border border-white/5 p-6 rounded-3xl backdrop-blur-xl sticky top-0 z-20">
-          <div>
-            <h2 class="text-2xl font-black capitalize tracking-tight">{{ activeMenuObj?.label || activeTab }}</h2>
-            <p class="text-[12px] text-gray-500 font-medium">Manage and monitor your portfolio {{ activeMenuObj?.label?.toLowerCase() || activeTab.toLowerCase() }}</p>
+        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/5 border border-white/5 p-5 lg:p-6 rounded-3xl backdrop-blur-xl sticky top-0 z-20">
+          <div class="flex items-center gap-4 w-full sm:w-auto">
+            <!-- Mobile Menu Toggle -->
+            <button 
+              @click="isSidebarOpen = !isSidebarOpen" 
+              class="lg:hidden w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 hover:text-white"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <div>
+              <h2 class="text-xl lg:text-2xl font-black capitalize tracking-tight">{{ activeMenuObj?.label || activeTab }}</h2>
+              <p class="text-[10px] lg:text-[12px] text-gray-500 font-medium">Manage your portfolio {{ activeMenuObj?.label?.toLowerCase() || activeTab.toLowerCase() }}</p>
+            </div>
           </div>
-          <button v-if="['Works', 'Certs', 'Stacks', 'Resume', 'Settings'].includes(activeTab)" @click="activeTab === 'Resume' ? saveResume() : saveAll()" class="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-indigo-600 text-xs font-black uppercase tracking-widest shadow-xl shadow-cyan-500/20 hover:scale-105 active:scale-95 transition-all text-white">
+          <button v-if="['Works', 'Certs', 'Stacks', 'Resume', 'Settings'].includes(activeTab)" @click="activeTab === 'Resume' ? saveResume() : saveAll()" class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-indigo-600 text-xs font-black uppercase tracking-widest shadow-xl shadow-cyan-500/20 hover:scale-105 active:scale-95 transition-all text-white">
             Save Changes
           </button>
         </header>
 
         <!-- Dashboard View -->
         <div v-if="activeTab === 'Dashboard'" class="space-y-8 animate-fade-in">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="p-8 rounded-[32px] bg-gradient-to-br from-cyan-500/10 to-transparent border border-cyan-500/20 flex flex-col gap-6 relative overflow-hidden group">
                <div class="absolute -right-6 -top-6 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl group-hover:bg-cyan-500/20 transition-all"></div>
                <div class="w-14 h-14 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center shadow-lg shadow-cyan-500/10">
@@ -109,101 +134,20 @@
                  <h3 class="text-5xl font-black text-white">{{ stacks.length }}</h3>
                </div>
             </div>
-          </div>
 
-          <!-- Resume Request Stats -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="p-6 rounded-[28px] bg-white/5 border border-white/5 flex flex-col gap-4 relative overflow-hidden group">
-               <div class="flex items-center gap-4">
-                 <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center border border-cyan-500/20">
-                   <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                 </div>
-                 <div>
-                   <p class="text-[10px] text-gray-500 font-black uppercase tracking-widest">Total Requests</p>
-                   <h3 class="text-2xl font-black text-white">{{ requestCount }}</h3>
-                 </div>
+            <div class="p-8 rounded-[32px] bg-gradient-to-br from-amber-500/10 to-transparent border border-amber-500/20 flex flex-col gap-6 relative overflow-hidden group">
+               <div class="absolute -right-6 -top-6 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-all"></div>
+               <div class="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center shadow-lg shadow-amber-500/10">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
                </div>
-            </div>
-
-            <div class="p-6 rounded-[28px] bg-white/5 border border-white/5 flex flex-col gap-4 relative overflow-hidden group">
-               <div class="flex items-center gap-4">
-                 <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                 </div>
-                 <div>
-                   <p class="text-[10px] text-gray-500 font-black uppercase tracking-widest">Pending</p>
-                   <h3 class="text-2xl font-black text-amber-400">{{ pendingRequestCount }}</h3>
-                 </div>
-               </div>
-            </div>
-
-            <div class="p-6 rounded-[28px] bg-white/5 border border-white/5 flex flex-col gap-4 relative overflow-hidden group">
-               <div class="flex items-center gap-4">
-                 <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-                 </div>
-                 <div>
-                   <p class="text-[10px] text-gray-500 font-black uppercase tracking-widest">Accepted</p>
-                   <h3 class="text-2xl font-black text-emerald-500">{{ acceptedRequestCount }}</h3>
-                 </div>
-               </div>
-            </div>
-
-            <div class="p-6 rounded-[28px] bg-white/5 border border-white/5 flex flex-col gap-4 relative overflow-hidden group">
-               <div class="flex items-center gap-4">
-                 <div class="w-12 h-12 rounded-2xl bg-red-500/10 text-red-400 flex items-center justify-center border border-red-500/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                 </div>
-                 <div>
-                   <p class="text-[10px] text-gray-500 font-black uppercase tracking-widest">Declined</p>
-                   <h3 class="text-2xl font-black text-red-500">{{ declinedRequestCount }}</h3>
-                 </div>
+               <div>
+                 <p class="text-[10px] text-amber-400/80 font-black uppercase tracking-[0.2em] mb-1">Resume Downloads</p>
+                 <h3 class="text-5xl font-black text-white">{{ resumeDownloads }}</h3>
                </div>
             </div>
           </div>
-          
-          <!-- Recent Requests Section -->
-          <div class="bg-white/5 border border-white/5 rounded-[32px] p-8 hidden md:block">
-            <div class="flex items-center justify-between mb-8">
-              <h3 class="text-xl font-black flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center border border-indigo-500/20">
-                  <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-                </div>
-                Latest Pending Requests
-              </h3>
-              <button @click="activeTab = 'Requests'" class="text-[10px] font-black uppercase tracking-widest text-cyan-400 hover:text-cyan-300 transition-colors">View All Requests</button>
-            </div>
-            
-            <div v-if="latestRequests.length === 0" class="flex flex-col items-center justify-center p-12 border border-dashed border-white/10 rounded-[28px] bg-white/[0.01]">
-              <div class="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400 mb-4">
-                 <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-              </div>
-              <p class="text-sm text-gray-400 font-bold">All caught up!</p>
-              <p class="text-[11px] text-gray-500 mt-1 uppercase tracking-widest">No pending resume requests to review.</p>
-            </div>
-            
-            <div v-else class="space-y-4">
-              <div v-for="request in latestRequests" :key="request.id" class="flex items-center justify-between p-5 rounded-2xl bg-[#0a0a0a] border border-white/5 hover:border-white/10 transition-all group">
-                <div class="flex items-center gap-5 overflow-hidden">
-                   <div class="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center text-gray-500 flex-shrink-0">
-                      <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                   </div>
-                   <div class="truncate">
-                      <h4 class="text-sm font-bold text-white mb-1 truncate">{{ request.email }}</h4>
-                      <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{{ formatRequestDate(request.submitted_at || request.created_at) }}</p>
-                   </div>
-                </div>
-                <div class="flex items-center gap-6">
-                   <div class="hidden lg:block max-w-[200px] truncate">
-                      <p class="text-[11px] text-gray-400 italic">"{{ request.purpose }}"</p>
-                   </div>
-                   <span :class="statusBadgeClass(request.status)">
-                      {{ formatRequestStatus(request.status) }}
-                   </span>
-                </div>
-              </div>
-            </div>
-          </div>
+
+
         </div>
 
         <!-- Management View (Works, Certs, Stacks) -->
@@ -856,151 +800,7 @@
           </div>
         </div>
 
-        <!-- Requests View -->
-        <div v-else-if="activeTab === 'Requests'" class="space-y-8 animate-fade-in">
-          <div class="bg-white/5 border border-white/5 rounded-[32px] p-8 lg:p-10 relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 to-indigo-600 opacity-50"></div>
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-              <div class="flex items-start gap-4">
-                <div class="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center flex-shrink-0">
-                  <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                </div>
-                <div>
-                  <p class="text-[10px] text-cyan-400/80 font-black uppercase tracking-[0.2em] mb-2">Resume Access Inbox</p>
-                  <h3 class="text-2xl font-black text-white">Requests</h3>
-                  <p class="text-sm text-gray-500 max-w-2xl mt-2">This section now shows the email address and purpose submitted by visitors who request access to your resume.</p>
-                </div>
-              </div>
-              <div class="flex items-center gap-3">
-                <div class="px-4 py-2 rounded-2xl border border-cyan-500/20 bg-cyan-500/10 text-cyan-400 text-xs font-black uppercase tracking-widest">
-                  {{ requestCount }} Total
-                </div>
-                <div class="px-4 py-2 rounded-2xl border border-amber-500/20 bg-amber-500/10 text-amber-300 text-xs font-black uppercase tracking-widest">
-                  {{ pendingRequestCount }} Pending
-                </div>
-                <button @click="fetchResumeRequests" class="px-5 py-3 rounded-2xl border border-white/10 bg-white/5 text-xs font-black uppercase tracking-widest text-gray-200 hover:bg-white/10 transition-all">
-                  Refresh
-                </button>
-              </div>
-            </div>
-          </div>
 
-          <!-- Requests Search & Filter Bar -->
-          <div class="flex flex-col md:flex-row gap-4 items-stretch">
-            <div class="relative flex-1">
-              <div class="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
-                <svg class="w-5 h-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-              </div>
-              <input 
-                v-model="searchQuery" 
-                type="text" 
-                placeholder="Search by email or purpose..."
-                class="w-full bg-white/5 border border-white/5 rounded-2xl pl-14 pr-6 py-5 text-sm focus:border-cyan-500/30 outline-none transition-all placeholder:text-gray-600 text-white"
-              >
-            </div>
-            
-            <div class="relative min-w-[200px]">
-              <select 
-                v-model="statusFilter"
-                class="w-full h-full bg-white/5 border border-white/5 rounded-2xl px-6 py-5 text-sm focus:border-cyan-500/30 outline-none transition-all text-white appearance-none cursor-pointer"
-              >
-                <option value="all" class="bg-[#0a0a0a]">All Statuses</option>
-                <option value="pending" class="bg-[#0a0a0a]">Pending Only</option>
-                <option value="accepted" class="bg-[#0a0a0a]">Accepted Only</option>
-                <option value="declined" class="bg-[#0a0a0a]">Declined Only</option>
-              </select>
-              <div class="absolute inset-y-0 right-0 pr-6 flex items-center pointer-events-none text-gray-500">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-              </div>
-            </div>
-          </div>
-
-          <div v-if="isLoadingRequests" class="rounded-[32px] border border-white/10 bg-white/5 p-12 text-center text-sm text-gray-400">
-            Loading resume requests...
-          </div>
-
-          <div v-else-if="requestsError" class="rounded-[32px] border border-red-500/20 bg-red-500/5 p-8 text-sm text-red-300">
-            {{ requestsError }}
-          </div>
-
-          <div v-else-if="filteredResumeRequests.length === 0" class="rounded-[32px] border border-dashed border-white/10 bg-white/5 p-12 text-center">
-            <div class="w-20 h-20 mx-auto rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center mb-6 text-white/40">
-              <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-            </div>
-            <h4 class="text-xl font-black text-white mb-2">{{ searchQuery ? 'No Matches Found' : 'No Requests Yet' }}</h4>
-            <p class="text-sm text-gray-500">{{ searchQuery ? 'Try adjusting your search terms to find what you are looking for.' : 'Once someone requests access to your resume, their email and purpose will appear here.' }}</p>
-          </div>
-
-          <div v-else class="bg-white/5 border border-white/5 rounded-[32px] overflow-hidden">
-            <div class="overflow-x-auto">
-              <table class="min-w-full text-left">
-                <thead class="bg-white/[0.03] border-b border-white/5">
-                  <tr>
-                    <th class="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Email</th>
-                    <th class="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Purpose</th>
-                    <th class="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Submitted</th>
-                    <th class="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Status</th>
-                    <th class="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    v-for="request in filteredResumeRequests"
-                    :key="request.id"
-                    class="border-b border-white/5 last:border-b-0 hover:bg-white/[0.03] transition-colors"
-                  >
-                    <td class="px-6 py-5 align-top">
-                      <a :href="`mailto:${request.email}`" class="text-sm font-bold text-white break-all hover:text-cyan-400 transition-colors">
-                        {{ request.email }}
-                      </a>
-                    </td>
-                    <td class="px-6 py-5 align-top">
-                      <p class="text-sm leading-relaxed text-gray-200 whitespace-pre-line min-w-[280px] max-w-xl">
-                        {{ request.purpose }}
-                      </p>
-                    </td>
-                    <td class="px-6 py-5 align-top">
-                      <p class="text-sm text-gray-300 whitespace-nowrap">{{ formatRequestDate(request.submitted_at || request.created_at) }}</p>
-                    </td>
-                    <td class="px-6 py-5 align-top">
-                      <span :class="statusBadgeClass(request.status)">
-                        {{ formatRequestStatus(request.status) }}
-                      </span>
-                    </td>
-                    <td class="px-6 py-5 align-top">
-                      <div class="flex items-center justify-end gap-3">
-                        <button
-                          @click="updateResumeRequestStatus(request, 'accepted')"
-                          :disabled="isRequestActionLoading(request.id) || request.status === 'accepted'"
-                          :class="[
-                            'px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all',
-                            isRequestActionLoading(request.id) || request.status === 'accepted'
-                              ? 'bg-emerald-500/10 text-emerald-300/50 cursor-not-allowed'
-                              : 'bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25'
-                          ]"
-                        >
-                          {{ isRequestActionLoading(request.id) && pendingRequestAction.status === 'accepted' ? 'Saving...' : 'Accept' }}
-                        </button>
-                        <button
-                          @click="updateResumeRequestStatus(request, 'declined')"
-                          :disabled="isRequestActionLoading(request.id) || request.status === 'declined'"
-                          :class="[
-                            'px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all',
-                            isRequestActionLoading(request.id) || request.status === 'declined'
-                              ? 'bg-red-500/10 text-red-300/50 cursor-not-allowed'
-                              : 'bg-red-500/15 text-red-300 hover:bg-red-500/25'
-                          ]"
-                        >
-                          {{ isRequestActionLoading(request.id) && pendingRequestAction.status === 'declined' ? 'Saving...' : 'Decline' }}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
 
         <!-- Settings View -->
         <div v-else-if="activeTab === 'Settings'" class="space-y-8 animate-fade-in pb-20">
@@ -1189,21 +989,13 @@ const menus = [
   { id: 'Certs', label: 'Certifications', icon: 'certs' },
   { id: 'Stacks', label: 'Tech Stacks', icon: 'stacks' },
   { id: 'Resume', label: 'Resume', icon: 'resume' },
-  { id: 'Requests', label: 'Requests', icon: 'requests' },
   { id: 'Settings', label: 'Settings', icon: 'settings' }
 ];
 
 const activeTab = ref('Dashboard');
 const selectedId = ref(null);
 const searchQuery = ref('');
-const resumeRequests = ref([]);
-const isLoadingRequests = ref(false);
-const requestsError = ref('');
-const statusFilter = ref('all');
-const pendingRequestAction = reactive({
-  id: null,
-  status: '',
-});
+const isSidebarOpen = ref(false);
 
 // Toast state and methods
 const toast = reactive({
@@ -1227,45 +1019,10 @@ const showToast = (title, message, type = 'success') => {
 
 watch(activeTab, (newTab) => {
   searchQuery.value = '';
-  statusFilter.value = 'all';
   resetForm();
-
-  if (newTab === 'Requests') {
-    fetchResumeRequests();
-  }
-});
-
-const filteredResumeRequests = computed(() => {
-  let filtered = resumeRequests.value;
-
-  // Status Filter
-  if (statusFilter.value !== 'all') {
-    filtered = filtered.filter(request => request.status === statusFilter.value);
-  }
-
-  // Search Query
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase();
-    filtered = filtered.filter(request => {
-      return (request.email || '').toLowerCase().includes(query) || 
-             (request.purpose || '').toLowerCase().includes(query);
-    });
-  }
-
-  return filtered;
 });
 
 const activeMenuObj = computed(() => menus.find(m => m.id === activeTab.value));
-const requestCount = computed(() => resumeRequests.value.length);
-const pendingRequestCount = computed(() => resumeRequests.value.filter(request => request.status === 'pending').length);
-const acceptedRequestCount = computed(() => resumeRequests.value.filter(request => request.status === 'accepted').length);
-const declinedRequestCount = computed(() => resumeRequests.value.filter(request => request.status === 'declined').length);
-const latestRequests = computed(() => {
-  return resumeRequests.value
-    .filter(request => request.status === 'pending')
-    .sort((a, b) => new Date(b.submitted_at || b.created_at) - new Date(a.submitted_at || a.created_at))
-    .slice(0, 5);
-});
 
 const works = ref([]);
 const certs = ref([]);
@@ -1339,6 +1096,8 @@ const filteredItems = computed(() => {
     return title.includes(query) || desc.includes(query) || more.includes(query);
   });
 });
+
+const resumeDownloads = ref(0);
 
 const resumeData = reactive({
   basicInfo: {
@@ -1478,82 +1237,21 @@ const defaultWorks = [];
 const defaultCerts = [];
 const defaultStacks = [];
 
-const formatRequestStatus = (status) => {
-  if (status === 'accepted') return 'Accepted';
-  if (status === 'declined') return 'Declined';
-  return 'Pending';
-};
 
-const statusBadgeClass = (status) => {
-  if (status === 'accepted') {
-    return 'inline-flex items-center px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase tracking-widest';
-  }
-
-  if (status === 'declined') {
-    return 'inline-flex items-center px-3 py-1 rounded-full bg-red-500/15 border border-red-500/20 text-red-300 text-[10px] font-black uppercase tracking-widest';
-  }
-
-  return 'inline-flex items-center px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/20 text-amber-300 text-[10px] font-black uppercase tracking-widest';
-};
-
-const formatRequestDate = (value) => {
-  if (!value) return 'Just now';
-
-  return new Date(value).toLocaleString('en-PH', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  });
-};
-
-const isRequestActionLoading = (requestId) => pendingRequestAction.id === requestId;
-
-const fetchResumeRequests = async () => {
-  isLoadingRequests.value = true;
-  requestsError.value = '';
-
-  try {
-    const response = await axios.get('/resume-requests');
-    resumeRequests.value = Array.isArray(response.data) ? response.data : [];
-  } catch (error) {
-    console.error('Unable to load resume requests:', error);
-    requestsError.value = 'Unable to load resume requests right now. Please try refreshing the list.';
-  } finally {
-    isLoadingRequests.value = false;
-  }
-};
-
-const updateResumeRequestStatus = async (request, status) => {
-  if (!request?.id || request.status === status) return;
-
-  pendingRequestAction.id = request.id;
-  pendingRequestAction.status = status;
-  requestsError.value = '';
-
-  try {
-    const response = await axios.patch(`/resume-requests/${request.id}/status`, { status });
-    
-    const updatedRequest = response.data;
-    const index = resumeRequests.value.findIndex(item => item.id === request.id);
-    if (index !== -1) {
-      resumeRequests.value[index] = updatedRequest;
-    }
-  } catch (error) {
-    console.error('Unable to update resume request status:', error);
-    requestsError.value = 'Unable to update the request status right now. Please try again.';
-  } finally {
-    pendingRequestAction.id = null;
-    pendingRequestAction.status = '';
-  }
-};
 
 const fetchResume = async () => {
   try {
     const response = await axios.get('/resume');
-    if (response.data && response.data.basicInfo) {
-      // Merge data carefully
-      const currentBasic = { ...resumeData.basicInfo };
-      Object.assign(resumeData, response.data);
-      resumeData.basicInfo = { ...currentBasic, ...response.data.basicInfo };
+    if (response.data) {
+      if (response.data.downloads !== undefined) {
+        resumeDownloads.value = response.data.downloads;
+      }
+      if (response.data.basicInfo) {
+        // Merge data carefully
+        const currentBasic = { ...resumeData.basicInfo };
+        Object.assign(resumeData, response.data);
+        resumeData.basicInfo = { ...currentBasic, ...response.data.basicInfo };
+      }
     }
   } catch (error) {
     console.error('Unable to load resume from database:', error);
@@ -1646,7 +1344,6 @@ onMounted(() => {
   fetchAboutImages();
   fetchSocialLinks();
   fetchAdminSecurity();
-  fetchResumeRequests();
 });
 
 const resetForm = () => {

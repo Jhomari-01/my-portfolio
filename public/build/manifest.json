@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-atzdyWPB.css",
+    "file": "assets/app-CWozN4Um.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -9,12 +9,37 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-DAu2p6LQ.js",
+    "file": "assets/app-ffaOco-K.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
+    "dynamicImports": [
+      "resources/js/components/AdminDashboard.vue",
+      "resources/js/components/AdminLogin.vue"
+    ],
     "css": [
-      "assets/app-ySiqjnpC.css"
+      "assets/app-syqpOy9n.css"
+    ]
+  },
+  "resources/js/components/AdminDashboard.vue": {
+    "file": "assets/AdminDashboard-BxuId87B.js",
+    "name": "AdminDashboard",
+    "src": "resources/js/components/AdminDashboard.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/AdminDashboard-_ojVXjSC.css"
+    ]
+  },
+  "resources/js/components/AdminLogin.vue": {
+    "file": "assets/AdminLogin-Bp6UvNLn.js",
+    "name": "AdminLogin",
+    "src": "resources/js/components/AdminLogin.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
     ]
   }
 }
